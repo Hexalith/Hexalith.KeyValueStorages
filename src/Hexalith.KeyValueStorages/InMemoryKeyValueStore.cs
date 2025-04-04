@@ -65,7 +65,7 @@ public abstract class InMemoryKeyValueStore<TKey, TValue, TEtag> : IKeyValueStor
     }
 
     /// <inheritdoc/>
-    public Task<bool> RemoveAsync(TKey key, CancellationToken cancellationToken)
+    public Task<bool> RemoveAsync(TKey key, TEtag etag, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())

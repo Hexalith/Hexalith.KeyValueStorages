@@ -45,9 +45,10 @@ public interface IKeyValueStore<TKey, TValue, TEtag>
     /// Asynchronously removes the element with the specified key from the store.
     /// </summary>
     /// <param name="key">The key of the element to remove.</param>
+    /// <param name="etag">The ETag associated with the value. If null, the element will be removed regardless of its ETag.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation. The result is true if the element is successfully found and removed; otherwise, false.</returns>
-    Task<bool> RemoveAsync(TKey key, CancellationToken cancellationToken);
+    Task<bool> RemoveAsync(TKey key, TEtag etag, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously adds a new key/value pair or updates the value if the key already exists.
