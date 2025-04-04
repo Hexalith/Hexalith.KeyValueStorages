@@ -1,0 +1,90 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35906.104
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{3929FBF6-EDA1-4CA7-8541-C460D0DCE449}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-release.yml = .github\workflows\build-release.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage", "src\Hexalith.MyNewPackage\Hexalith.MyNewPackage.csproj", "{466549CC-5EDB-4881-F87F-C720AFD4D468}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{F9B9A5B1-8090-40C2-B46F-F4083B72C8BC}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		package.json = package.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Tests", "test\Hexalith.MyNewPackage.Tests\Hexalith.MyNewPackage.Tests.csproj", "{A0520529-37CD-4558-8D3C-119DB006D10D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E1479EA-06ED-4A69-8F50-F17804066FA6}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+		src\README.md = src\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{EDB74E69-759C-4EC4-911B-DF6D777A6CFA}"
+	ProjectSection(SolutionItems) = preProject
+		test\README.md = test\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".project", ".project", "{597A1021-74C4-481C-993A-0AC1600514FB}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.gitmodules = .gitmodules
+		DOCUMENTATION.ai.md = DOCUMENTATION.ai.md
+		initialize.ps1 = initialize.ps1
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Directory.Build.Props = samples\Directory.Build.Props
+		examples\README.md = examples\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Example", "examples\Hexalith.MyNewPackage.Example\Hexalith.MyNewPackage.Example.csproj", "{52A95C3D-7705-406D-B0F6-C49017FC525F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Abstractions", "src\Hexalith.MyNewPackage.Abstractions\Hexalith.MyNewPackage.Abstractions.csproj", "{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{466549CC-5EDB-4881-F87F-C720AFD4D468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{466549CC-5EDB-4881-F87F-C720AFD4D468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{466549CC-5EDB-4881-F87F-C720AFD4D468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{466549CC-5EDB-4881-F87F-C720AFD4D468}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0520529-37CD-4558-8D3C-119DB006D10D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0520529-37CD-4558-8D3C-119DB006D10D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0520529-37CD-4558-8D3C-119DB006D10D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0520529-37CD-4558-8D3C-119DB006D10D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3929FBF6-EDA1-4CA7-8541-C460D0DCE449} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{466549CC-5EDB-4881-F87F-C720AFD4D468} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
+		{A0520529-37CD-4558-8D3C-119DB006D10D} = {EDB74E69-759C-4EC4-911B-DF6D777A6CFA}
+		{52A95C3D-7705-406D-B0F6-C49017FC525F} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
+		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B7376F4-B33A-4BC6-AFCA-C09B437568D7}
+	EndGlobalSection
+EndGlobal
