@@ -3,9 +3,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages;
+namespace Hexalith.KeyValueStorages.Files;
 
 using System;
+
+using Hexalith.KeyValueStorages;
 
 /// <summary>
 /// Represents a key-value storage that uses JSON files for persistence.

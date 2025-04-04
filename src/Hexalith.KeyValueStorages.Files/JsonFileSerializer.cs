@@ -3,13 +3,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages;
+namespace Hexalith.KeyValueStorages.Files;
 
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Hexalith.KeyValueStorages;
 
 /// <summary>
 /// Serializer for JSON file values.

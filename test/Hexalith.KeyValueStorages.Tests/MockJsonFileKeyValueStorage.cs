@@ -6,6 +6,7 @@
 namespace Hexalith.KeyValueStorages.Tests;
 
 using Hexalith.Commons.UniqueIds;
+using Hexalith.KeyValueStorages.Files;
 
 /// <summary>
 /// Mock implementation of JsonFileKeyValueStorage for testing.

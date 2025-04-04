@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);IDE0079;RCS1251;</NoWarn>
+    <NoWarn>$(NoWarn);IDE0079;RCS1251;S3881;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
     <ProjectReference Include="..\..\src\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
   </ItemGroup>
 

@@ -7,6 +7,8 @@ namespace Hexalith.KeyValueStorages.Tests;
 
 using System.Text.Json;
 
+using Hexalith.KeyValueStorages.Files;
+
 /// <summary>
 /// Mock implementation of JsonFileSerializer for testing.
 /// </summary>
@@ -18,7 +20,7 @@ public class MockJsonFileSerializer<TValue, TEtag> : IValueSerializer<TValue, TE
 {
     private readonly JsonSerializerOptions _options = new()
     {
-        WriteIndented = true
+        WriteIndented = true,
     };
 
     /// <inheritdoc/>
@@ -52,7 +54,7 @@ public class MockJsonFileSerializer<TValue, TEtag> : IValueSerializer<TValue, TE
     public async Task SerializeAsync(Stream stream, TValue value, TEtag etag, CancellationToken cancellationToken)
     {
         string json = Serialize(value, etag);
-        using StreamWriter writer = new(stream);
+        await using StreamWriter writer = new(stream);
         await writer.WriteAsync(json.AsMemory(), cancellationToken).ConfigureAwait(false);
     }
 }
