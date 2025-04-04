@@ -41,13 +41,13 @@ public class MockJsonFileKeyValueStorage<TKey, TValue> :
     }
 
     /// <summary>
-    /// Generates a new ETag.
+    /// Generates a new Etag.
     /// </summary>
-    /// <returns>The generated ETag.</returns>
+    /// <returns>The generated Etag.</returns>
     protected override string GenerateEtag() => UniqueIdHelper.GenerateUniqueStringId();
 
     /// <summary>
-    /// Writes the value to the file with the specified ETag.
+    /// Writes the value to the file with the specified Etag.
     /// </summary>
     /// <param name="filePath">The file path.</param>
     /// <param name="value">The value to write.</param>

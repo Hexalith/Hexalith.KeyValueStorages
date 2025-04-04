@@ -40,8 +40,8 @@ public class JsonFileKeyValueStorage<TKey, TValue> :
     }
 
     /// <summary>
-    /// Generates a new ETag.
+    /// Generates a new Etag.
     /// </summary>
-    /// <returns>The generated ETag.</returns>
+    /// <returns>The generated Etag.</returns>
     protected override string GenerateEtag() => UniqueIdHelper.GenerateUniqueStringId();
 }

@@ -17,7 +17,7 @@ using Hexalith.KeyValueStorages;
 /// Serializer for JSON file values.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag.</typeparam>
+/// <typeparam name="TEtag">The type of the Etag.</typeparam>
 /// <remarks>
 /// Initializes a new instance of the <see cref="JsonFileSerializer{TValue, TEtag}"/> class.
 /// </remarks>

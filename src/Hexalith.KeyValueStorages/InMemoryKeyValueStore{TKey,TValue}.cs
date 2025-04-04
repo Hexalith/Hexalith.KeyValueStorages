@@ -6,7 +6,7 @@
 namespace Hexalith.KeyValueStorages;
 
 /// <summary>
-/// Represents an in-memory key-value store with automatic ETag generation.
+/// Represents an in-memory key-value store with automatic Etag generation.
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -15,15 +15,15 @@ public class InMemoryKeyValueStore<TKey, TValue> : InMemoryKeyValueStore<TKey, T
     where TValue : notnull
 {
     /// <summary>
-    /// Generates the initial ETag value.
+    /// Generates the initial Etag value.
     /// </summary>
-    /// <returns>The initial ETag value.</returns>
+    /// <returns>The initial Etag value.</returns>
     protected override long GenerateInitialEtag() => 1L;
 
     /// <summary>
-    /// Generates the next ETag value based on the previous ETag.
+    /// Generates the next Etag value based on the previous Etag.
     /// </summary>
-    /// <param name="previousEtag">The previous ETag value.</param>
-    /// <returns>The next ETag value.</returns>
+    /// <param name="previousEtag">The previous Etag value.</param>
+    /// <returns>The next Etag value.</returns>
     protected override long GenerateNextEtag(long previousEtag) => previousEtag + 1;
 }

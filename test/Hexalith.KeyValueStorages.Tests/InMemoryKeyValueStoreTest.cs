@@ -96,7 +96,7 @@ public class InMemoryKeyValueStoreTest
 
         // Assert
         result.Value.ShouldBe(100);
-        result.ETag.ShouldBe(1);
+        result.Etag.ShouldBe(1);
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ public class InMemoryKeyValueStoreTest
         newEtag.ShouldBe(2);
         StoreResult<long, long> result = await store.GetAsync(1, CancellationToken.None);
         result.Value.ShouldBe(200);
-        result.ETag.ShouldBe(2);
+        result.Etag.ShouldBe(2);
     }
 
     /// <summary>
@@ -236,6 +236,6 @@ public class InMemoryKeyValueStoreTest
         // Assert
         _ = result.ShouldNotBeNull();
         result.Value.ShouldBe(100);
-        result.ETag.ShouldBe(1);
+        result.Etag.ShouldBe(1);
     }
 }

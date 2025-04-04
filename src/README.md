@@ -6,12 +6,12 @@ This directory contains the source code for the Hexalith Key/Value Storages pack
 
 ### [Hexalith.KeyValueStorages](./Hexalith.KeyValueStorages/README.md)
 
-The main package that provides both in-memory and file-based key-value storage implementations with support for optimistic concurrency control through ETags.
+The main package that provides both in-memory and file-based key-value storage implementations with support for optimistic concurrency control through Etags.
 
 **Key Features:**
 
 - Generic type support for both keys and values
-- Optimistic concurrency control using ETags
+- Optimistic concurrency control using Etags
 - Thread-safe operations
 - Asynchronous API support
 - Multiple storage implementations

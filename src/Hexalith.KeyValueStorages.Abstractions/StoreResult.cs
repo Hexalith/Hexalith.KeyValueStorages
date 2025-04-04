@@ -6,9 +6,9 @@
 namespace Hexalith.KeyValueStorages;
 
 /// <summary>
-/// Represents the result of a store operation, containing the stored value and its associated ETag.
+/// Represents the result of a store operation, containing the stored value and its associated Etag.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag.</typeparam>
-public record class StoreResult<TValue, TEtag>(TValue Value, TEtag ETag)
+/// <typeparam name="TEtag">The type of the Etag.</typeparam>
+public record class StoreResult<TValue, TEtag>(TValue Value, TEtag Etag)
     where TEtag : notnull;

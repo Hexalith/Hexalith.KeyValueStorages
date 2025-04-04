@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hexalith.KeyValueStorages.Files provides file-based implementations of the key-value storage interfaces defined in Hexalith.KeyValueStorages.Abstractions. It offers a robust solution for persisting key-value pairs to the file system using JSON serialization, with built-in support for optimistic concurrency control through ETags.
+Hexalith.KeyValueStorages.Files provides file-based implementations of the key-value storage interfaces defined in Hexalith.KeyValueStorages.Abstractions. It offers a robust solution for persisting key-value pairs to the file system using JSON serialization, with built-in support for optimistic concurrency control through Etags.
 
 ## Purpose
 
@@ -26,22 +26,22 @@ This library serves several key purposes:
 ### JSON Serialization
 
 - Serializes values to JSON format for human-readable storage
-- Includes ETags in the serialized data for concurrency control
+- Includes Etags in the serialized data for concurrency control
 - Supports custom serialization options
 - Handles complex object graphs through System.Text.Json
 
 ### Optimistic Concurrency
 
-- Uses ETags to detect concurrent modifications
+- Uses Etags to detect concurrent modifications
 - Prevents data corruption from simultaneous updates
-- Throws ConcurrencyException when ETags don't match
-- Generates new ETags for each update
+- Throws ConcurrencyException when Etags don't match
+- Generates new Etags for each update
 
 ### Extensibility
 
 - Abstract base classes for creating custom file storage implementations
 - Pluggable serialization mechanisms
-- Support for different ETag types
+- Support for different Etag types
 
 ## Getting Started
 
@@ -71,7 +71,7 @@ string etag = await store.AddAsync("key1", new MyData { Name = "Test" }, Cancell
 // Retrieve a value
 var result = await store.GetAsync("key1", CancellationToken.None);
 MyData value = result.Value;
-string currentEtag = result.ETag;
+string currentEtag = result.Etag;
 
 // Update a value with concurrency check
 string newEtag = await store.SetAsync("key1", updatedData, currentEtag, CancellationToken.None);
@@ -88,12 +88,12 @@ bool removed = await store.RemoveAsync("key1", currentEtag, CancellationToken.No
 ### Class Hierarchy
 
 - `FileKeyValueStorage<TKey, TValue, TEtag, TKeySerializer, TValueSerializer>`: Abstract base class for file-based storage
-  - `JsonFileKeyValueStorage<TKey, TValue, TEtag>`: Implementation using JSON serialization with custom ETag type
-    - `JsonFileKeyValueStorage<TKey, TValue>`: Simplified implementation using string ETags
+  - `JsonFileKeyValueStorage<TKey, TValue, TEtag>`: Implementation using JSON serialization with custom Etag type
+    - `JsonFileKeyValueStorage<TKey, TValue>`: Simplified implementation using string Etags
 
 ### Key Components
 
-- `JsonFileValue<TValue, TEtag>`: Record type for storing value and ETag together
+- `JsonFileValue<TValue, TEtag>`: Record type for storing value and Etag together
 - `JsonFileSerializer<TValue, TEtag>`: Serializer for JSON file values
 - `KeyToStringSerializer<TKey>`: Converts keys to file-safe string representations
 
@@ -138,9 +138,9 @@ string etag = await userStore.AddAsync("user123", profile, CancellationToken.Non
 
 ## Advanced Usage
 
-### Custom ETag Generation
+### Custom Etag Generation
 
-The `JsonFileKeyValueStorage<TKey, TValue>` class uses string ETags by default, generated using `UniqueIdHelper.GenerateUniqueStringId()`. You can create a custom implementation with different ETag types:
+The `JsonFileKeyValueStorage<TKey, TValue>` class uses string Etags by default, generated using `UniqueIdHelper.GenerateUniqueStringId()`. You can create a custom implementation with different Etag types:
 
 ```csharp
 public class CustomEtagStorage<TKey, TValue> :

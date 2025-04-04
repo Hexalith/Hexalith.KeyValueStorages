@@ -14,7 +14,7 @@ using Hexalith.KeyValueStorages;
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag.</typeparam>
+/// <typeparam name="TEtag">The type of the Etag.</typeparam>
 public class JsonFileKeyValueStorage<TKey, TValue, TEtag> :
     FileKeyValueStorage<
         TKey,
@@ -44,8 +44,8 @@ public class JsonFileKeyValueStorage<TKey, TValue, TEtag> :
     }
 
     /// <summary>
-    /// Generates a new ETag.
+    /// Generates a new Etag.
     /// </summary>
-    /// <returns>The generated ETag.</returns>
+    /// <returns>The generated Etag.</returns>
     protected override TEtag GenerateEtag() => throw new NotImplementedException();
 }

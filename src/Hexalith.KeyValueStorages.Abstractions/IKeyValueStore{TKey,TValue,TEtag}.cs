@@ -10,7 +10,7 @@ namespace Hexalith.KeyValueStorages;
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the store. Must be non-nullable.</typeparam>
 /// <typeparam name="TValue">The type of the values in the store.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag associated with the values. Must be non-nullable.</typeparam>
+/// <typeparam name="TEtag">The type of the Etag associated with the values. Must be non-nullable.</typeparam>
 public interface IKeyValueStore<TKey, TValue, TEtag>
     where TEtag : notnull
     where TKey : notnull
@@ -45,7 +45,7 @@ public interface IKeyValueStore<TKey, TValue, TEtag>
     /// Asynchronously removes the element with the specified key from the store.
     /// </summary>
     /// <param name="key">The key of the element to remove.</param>
-    /// <param name="etag">The ETag associated with the value. If null, the element will be removed regardless of its ETag.</param>
+    /// <param name="etag">The Etag associated with the value. If null, the element will be removed regardless of its Etag.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation. The result is true if the element is successfully found and removed; otherwise, false.</returns>
     Task<bool> RemoveAsync(TKey key, TEtag etag, CancellationToken cancellationToken);
@@ -55,7 +55,7 @@ public interface IKeyValueStore<TKey, TValue, TEtag>
     /// </summary>
     /// <param name="key">The key of the element to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
-    /// <param name="etag">The ETag associated with the value. If null, a new ETag will be generated.</param>
+    /// <param name="etag">The Etag associated with the value. If null, a new Etag will be generated.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>Returns the Etag.</returns>
     Task<TEtag> SetAsync(TKey key, TValue value, TEtag etag, CancellationToken cancellationToken);

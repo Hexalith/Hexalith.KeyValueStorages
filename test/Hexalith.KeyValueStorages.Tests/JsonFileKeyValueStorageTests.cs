@@ -150,7 +150,7 @@ public class JsonFileKeyValueStorageTests : IDisposable
         result.Value.Started.ShouldBe(value.Started);
         result.Value.Retries.ShouldBe(value.Retries);
         result.Value.Failed.ShouldBe(value.Failed);
-        result.ETag.ShouldBe(etag);
+        result.Etag.ShouldBe(etag);
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public class JsonFileKeyValueStorageTests : IDisposable
     }
 
     /// <summary>
-    /// Tests that the SetAsync method throws an exception when the ETag does not match.
+    /// Tests that the SetAsync method throws an exception when the Etag does not match.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
@@ -271,8 +271,8 @@ public class JsonFileKeyValueStorageTests : IDisposable
         result.Value.Retries.ShouldBe(updatedValue.Retries);
         result.Value.Failed.ShouldBe(updatedValue.Failed);
 
-        // Note: In a real implementation, the ETag in the result should match the new ETag
-        // However, due to the implementation of FileKeyValueStorage.SetAsync, it uses the old ETag when writing to the file
+        // Note: In a real implementation, the Etag in the result should match the new Etag
+        // However, due to the implementation of FileKeyValueStorage.SetAsync, it uses the old Etag when writing to the file
         // This is a bug in the implementation that should be fixed
     }
 

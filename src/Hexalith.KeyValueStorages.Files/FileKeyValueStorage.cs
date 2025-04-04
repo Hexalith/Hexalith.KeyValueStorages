@@ -108,9 +108,9 @@ public abstract class FileKeyValueStorage<TKey, TValue, TEtag, TKeySerializer, T
         }
 
         StoreResult<TValue, TEtag> current = await GetAsync(key, cancellationToken).ConfigureAwait(false);
-        if (!current.ETag.Equals(etag))
+        if (!current.Etag.Equals(etag))
         {
-            throw new ConcurrencyException($"Etag mismatch for key {key}. Expected: {etag}, Current: {current.ETag}");
+            throw new ConcurrencyException($"Etag mismatch for key {key}. Expected: {etag}, Current: {current.Etag}");
         }
 
         TEtag newEtag = GenerateEtag();

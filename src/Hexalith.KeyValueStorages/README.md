@@ -2,14 +2,14 @@
 
 ## Overview
 
-Hexalith Key/Value Storages is a flexible and extensible key-value storage library for .NET applications. It provides both in-memory and file-based storage implementations with support for optimistic concurrency control through ETags.
+Hexalith Key/Value Storages is a flexible and extensible key-value storage library for .NET applications. It provides both in-memory and file-based storage implementations with support for optimistic concurrency control through Etags.
 
 ## Purpose
 
 The library offers a robust foundation for implementing key-value storage solutions with the following features:
 
 - Generic type support for both keys and values
-- Optimistic concurrency control using ETags
+- Optimistic concurrency control using Etags
 - Multiple storage implementations:
   - In-memory storage for fast, temporary data
   - File-based storage with JSON serialization
@@ -46,7 +46,7 @@ long etag = await store.AddAsync("key1", new MyData(), CancellationToken.None);
 // Retrieve a value
 var result = await store.GetAsync("key1", CancellationToken.None);
 MyData value = result.Value;
-long currentEtag = result.ETag;
+long currentEtag = result.Etag;
 
 // Update a value
 long newEtag = await store.SetAsync("key1", updatedData, currentEtag, CancellationToken.None);
@@ -68,13 +68,13 @@ string etag = await store.AddAsync("key1", new MyData(), CancellationToken.None)
 
 - `IKeyValueStore<TKey, TValue, TEtag>`: The main interface defining key-value store operations
 - `IKeySerializer<TKey>`: Interface for key serialization
-- `IValueSerializer<TValue, TEtag>`: Interface for value serialization with ETag support
+- `IValueSerializer<TValue, TEtag>`: Interface for value serialization with Etag support
 
 ### Implementations
 
 1. In-Memory Storage:
-   - `InMemoryKeyValueStore<TKey, TValue>`: Simple in-memory implementation with long-based ETags
-   - `InMemoryKeyValueStore<TKey, TValue, TEtag>`: Base class supporting custom ETag types
+   - `InMemoryKeyValueStore<TKey, TValue>`: Simple in-memory implementation with long-based Etags
+   - `InMemoryKeyValueStore<TKey, TValue, TEtag>`: Base class supporting custom Etag types
 
 2. [File Storage](https://hexalith.github.io/Hexalith.KeyValueStores).
 
@@ -82,9 +82,9 @@ string etag = await store.AddAsync("key1", new MyData(), CancellationToken.None)
 
 ### Optimistic Concurrency
 
-The library implements optimistic concurrency control using ETags:
-- Each value has an associated ETag
-- Updates require the current ETag
+The library implements optimistic concurrency control using Etags:
+- Each value has an associated Etag
+- Updates require the current Etag
 - Concurrent modifications are detected and prevented
 
 ### Thread Safety

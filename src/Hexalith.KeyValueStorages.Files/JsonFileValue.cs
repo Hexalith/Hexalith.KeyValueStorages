@@ -8,10 +8,10 @@ namespace Hexalith.KeyValueStorages.Files;
 using System.Runtime.Serialization;
 
 /// <summary>
-/// Represents a JSON file value with an associated ETag.
+/// Represents a JSON file value with an associated Etag.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag.</typeparam>
+/// <typeparam name="TEtag">The type of the Etag.</typeparam>
 [DataContract]
 public record JsonFileValue<TValue, TEtag>(
     [property: DataMember(Order = 1)] TValue Value,

@@ -13,7 +13,7 @@ using Hexalith.KeyValueStorages.Files;
 /// Mock implementation of JsonFileSerializer for testing.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the ETag.</typeparam>
+/// <typeparam name="TEtag">The type of the Etag.</typeparam>
 public class MockJsonFileSerializer<TValue, TEtag> : IValueSerializer<TValue, TEtag>
     where TValue : notnull
     where TEtag : notnull
