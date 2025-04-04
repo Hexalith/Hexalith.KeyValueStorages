@@ -187,5 +187,6 @@ public abstract class FileKeyValueStorage<TKey, TValue, TEtag, TKeySerializer, T
     {
         await using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         await _valueSerializer.SerializeAsync(stream, value, etag, cancellationToken).ConfigureAwait(false);
+        await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -5,7 +5,6 @@
 
 namespace Hexalith.KeyValueStorages.Files;
 
-using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -53,11 +52,18 @@ public class JsonFileSerializer<TValue, TEtag> : IValueSerializer<TValue, TEtag>
     }
 
     /// <inheritdoc/>
-    public Task<(TValue Value, TEtag Etag)> DeserializeAsync(Stream stream, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public async Task<(TValue Value, TEtag Etag)> DeserializeAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        JsonFileValue<TValue, TEtag> result = (await JsonSerializer.DeserializeAsync<JsonFileValue<TValue, TEtag>>(stream, _options, cancellationToken))
+            ?? throw new JsonException("Deserialization return a null value");
+        return (result.Value, result.Etag);
+    }
 
     /// <inheritdoc/>
-    public string Serialize(TValue value, TEtag etag) => throw new NotImplementedException();
+    public string Serialize(TValue value, TEtag etag)
+        => JsonSerializer.Serialize(new JsonFileValue<TValue, TEtag>(value, etag), _options);
 
     /// <inheritdoc/>
-    public Task SerializeAsync(Stream stream, TValue value, TEtag etag, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public Task SerializeAsync(Stream stream, TValue value, TEtag etag, CancellationToken cancellationToken)
+        => JsonSerializer.SerializeAsync(stream, new JsonFileValue<TValue, TEtag>(value, etag), _options, cancellationToken);
 }
