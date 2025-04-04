@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\build-release.yml = .github\workflows\build-release.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage", "src\Hexalith.MyNewPackage\Hexalith.MyNewPackage.csproj", "{466549CC-5EDB-4881-F87F-C720AFD4D468}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages", "src\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj", "{466549CC-5EDB-4881-F87F-C720AFD4D468}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{F9B9A5B1-8090-40C2-B46F-F4083B72C8BC}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{F9B9A5
 		package.json = package.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Tests", "test\Hexalith.MyNewPackage.Tests\Hexalith.MyNewPackage.Tests.csproj", "{A0520529-37CD-4558-8D3C-119DB006D10D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Tests", "test\Hexalith.KeyValueStorages.Tests\Hexalith.KeyValueStorages.Tests.csproj", "{A0520529-37CD-4558-8D3C-119DB006D10D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E1479EA-06ED-4A69-8F50-F17804066FA6}"
 	ProjectSection(SolutionItems) = preProject
@@ -47,9 +47,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{3E
 		examples\README.md = examples\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Example", "examples\Hexalith.MyNewPackage.Example\Hexalith.MyNewPackage.Example.csproj", "{52A95C3D-7705-406D-B0F6-C49017FC525F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Example", "examples\Hexalith.KeyValueStorages.Example\Hexalith.KeyValueStorages.Example.csproj", "{52A95C3D-7705-406D-B0F6-C49017FC525F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.MyNewPackage.Abstractions", "src\Hexalith.MyNewPackage.Abstractions\Hexalith.MyNewPackage.Abstractions.csproj", "{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Abstractions", "src\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj", "{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-# Hexalith MyNewPackage
+# Hexalith KeyValueStorages
 
 ## Overview
 
@@ -6,7 +6,7 @@ This repository serves as a template for creating new packages for the Hexalith 
 
 ## Purpose
 
-The Hexalith MyNewPackage template simplifies the process of creating new packages by providing:
+The Hexalith KeyValueStorages template simplifies the process of creating new packages by providing:
 
 - Standardized project structure
 - Pre-configured build settings

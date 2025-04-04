@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hexalith.MyNewPackage\Hexalith.MyNewPackage.csproj" />
+    <ProjectReference Include="..\..\src\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
   </ItemGroup>
 
 </Project>

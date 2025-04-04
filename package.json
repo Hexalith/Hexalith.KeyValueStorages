@@ -1,11 +1,11 @@
 {
-  "name": "hexalith-mynewpackage",
+  "name": "hexalith-KeyValueStorages",
   "version": "0.0.0-development",
   "private": true,
-  "description": "Hexalith MyNewPackage libraries",
+  "description": "Hexalith KeyValueStorages libraries",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hexalith/Hexalith.MyNewPackage.git"
+    "url": "https://github.com/Hexalith/Hexalith.KeyValueStorages.git"
   },
   "release": {
     "branches": [ "main" ]

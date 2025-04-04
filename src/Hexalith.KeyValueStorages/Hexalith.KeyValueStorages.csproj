@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+    <Description>Hexalith KeyValueStorages utilities and helpers</Description>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</RepositoryUrl>
+    <PackageTags>hexalith;KeyValueStorages;</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj" />
+  </ItemGroup>
+</Project>
