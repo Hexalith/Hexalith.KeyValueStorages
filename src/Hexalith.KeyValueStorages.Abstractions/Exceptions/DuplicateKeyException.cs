@@ -6,8 +6,11 @@
 namespace Hexalith.KeyValueStorages.Exceptions;
 
 using System;
-using System.Runtime.Serialization;
 
+/// <summary>
+/// Exception thrown when a duplicate key is found in the key-value store.
+/// </summary>
+/// <typeparam name="TKey">The type of the key.</typeparam>
 public class DuplicateKeyException<TKey> : Exception
 {
     /// <summary>
@@ -20,7 +23,7 @@ public class DuplicateKeyException<TKey> : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="DuplicateKeyException{TKey}"/> class.
     /// </summary>
-    /// <param name="message"></param>
+    /// <param name="message">The message that describes the error.</param>"
     public DuplicateKeyException(string message)
         : base(message)
     {
@@ -29,8 +32,8 @@ public class DuplicateKeyException<TKey> : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="DuplicateKeyException{TKey}"/> class.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="innerException"></param>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception.</param>
     public DuplicateKeyException(string message, Exception innerException)
         : base(message, innerException)
     {
@@ -39,19 +42,12 @@ public class DuplicateKeyException<TKey> : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="DuplicateKeyException{TKey}"/> class.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key that caused the exception.</param>
     public DuplicateKeyException(TKey key)
         : base($"A duplicate key was found: {key}") => Key = key;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DuplicateKeyException{TKey}"/> class.
+    /// Gets the key that caused the exception.
     /// </summary>
-    /// <param name="info"></param>
-    /// <param name="context"></param>
-    protected DuplicateKeyException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
-
     public TKey Key { get; } = default!;
 }

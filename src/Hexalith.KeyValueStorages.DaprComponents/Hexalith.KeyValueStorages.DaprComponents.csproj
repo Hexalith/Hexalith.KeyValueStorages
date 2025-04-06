@@ -8,7 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapr.Actors" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" />
     <PackageReference Include="Dapr.Actors.Generators" />
+    <PackageReference Include="Hexalith.Commons.StringEncoders" />
     <PackageReference Include="Hexalith.Commons.UniqueIds" />
   </ItemGroup>
   <ItemGroup>

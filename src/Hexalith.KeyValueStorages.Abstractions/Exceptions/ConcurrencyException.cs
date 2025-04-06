@@ -35,7 +35,7 @@ public class ConcurrencyException<TKey> : Exception
     /// <param name="key">The key that caused the concurrency conflict.</param>
     /// <param name="etag">The etag of the key.</param>
     /// <param name="expectedEtag">The expected etag for the key.</param>
-    public ConcurrencyException(TKey key, string etag, string expectedEtag)
+    public ConcurrencyException(TKey key, string etag, string? expectedEtag)
         : base($"The key '{key}' has an etag '{etag}' but the expected etag is '{expectedEtag}'.")
     {
         Key = key;

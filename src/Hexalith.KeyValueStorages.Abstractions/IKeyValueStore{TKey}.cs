@@ -9,5 +9,5 @@ namespace Hexalith.KeyValueStorages;
 /// Defines a generic asynchronous interface for a key-value storage system.
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the store. Must be non-nullable.</typeparam>
-public interface IKeyValueStore<TKey> : IKeyValueStore<TKey, string, State>
+public interface IKeyValueStore<TKey> : IKeyValueStore<TKey, State<string, Dictionary<string, string>>>
     where TKey : notnull, IEquatable<TKey>;

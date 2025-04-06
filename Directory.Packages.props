@@ -5,8 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Dapr.Actors" Version="1.15.2" />
+    <PackageVersion Include="Dapr.Actors.AspNetCore" Version="1.15.2" />
     <PackageVersion Include="Dapr.Actors.Generators" Version="1.15.2" />
-    <PackageVersion Include="Hexalith.Commons.UniqueIds" Version="1.64.0" />
+    <PackageVersion Include="Hexalith.Commons.StringEncoders" Version="1.65.1" />
+    <PackageVersion Include="Hexalith.Commons.UniqueIds" Version="1.65.1" />
     <PackageVersion Include="Hexalith.PolymorphicSerialization" Version="1.55.0" />
   </ItemGroup>
   <!-- Import the parent Directory.Packages.props file if it exists -->

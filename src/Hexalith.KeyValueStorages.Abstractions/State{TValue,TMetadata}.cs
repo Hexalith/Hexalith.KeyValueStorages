@@ -17,8 +17,18 @@ using System.Runtime.Serialization;
 /// <param name="TimeToLive">The time to live for the value.</param>
 /// <param name="Etag">The etag associated with the value.</param>
 [DataContract]
-public abstract record class State<TValue, TMetadata>(
-    [property: DataMember(Order = 1)] TValue Value,
-    [property: DataMember(Order = 2)] TMetadata? Metadata,
-    [property: DataMember(Order = 3)] TimeSpan? TimeToLive,
-    [property: DataMember(Order = 4)] string? Etag);
+public record State<TValue, TMetadata>(
+    TValue Value,
+    [property: DataMember(Order = 4)] TMetadata? Metadata,
+    TimeSpan? TimeToLive,
+    string? Etag) : State<TValue>(Value, TimeToLive, Etag)
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="State{TValue, TMetadata}"/> class.
+    /// </summary>
+    /// <param name="value">The stored value.</param>
+    public State(TValue value)
+        : this(value, default, null, null)
+    {
+    }
+}

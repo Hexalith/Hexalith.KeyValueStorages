@@ -1,4 +1,4 @@
-// <copyright file="IKeyValueStore{TKey,TValue,TMetadata,TState}.cs" company="ITANEO">
+// <copyright file="IKeyValueStore{TKey,TState}.cs" company="ITANEO">
 // Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -9,14 +9,10 @@ namespace Hexalith.KeyValueStorages;
 /// Defines a generic asynchronous interface for a key-value storage system.
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the store. Must be non-nullable.</typeparam>
-/// <typeparam name="TValue">The type of the values in the store.</typeparam>
-/// <typeparam name="TMetadata">The type of the metadata associated with the values.</typeparam>
 /// <typeparam name="TState">The type of the state associated with the values.</typeparam>
-public interface IKeyValueStore<TKey, TValue, TMetadata, TState>
+public interface IKeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
-    where TValue : notnull
-    where TMetadata : notnull
-    where TState : State<TValue, TMetadata>
+    where TState : StateBase
 {
     /// <summary>
     /// Asynchronously adds a new key/value pair.
@@ -68,5 +64,5 @@ public interface IKeyValueStore<TKey, TValue, TMetadata, TState>
     /// <param name="key">The key whose value to get.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation. The result contains the value associated with the key, or null if the key is not found.</returns>
-    Task<TState?> TryGetValueAsync(TKey key, CancellationToken cancellationToken);
+    Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken);
 }

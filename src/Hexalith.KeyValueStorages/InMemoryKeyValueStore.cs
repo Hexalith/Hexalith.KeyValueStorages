@@ -16,15 +16,11 @@ using Hexalith.KeyValueStorages.Exceptions;
 /// An in-memory implementation of the IKeyValueStore interface.
 /// </summary>
 /// <typeparam name="TKey">The type of the key, must be non-null.</typeparam>
-/// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
-public class InMemoryKeyValueStore<TKey, TValue, TMetadata, TState>
-    : IKeyValueStore<TKey, TValue, TMetadata, TState>
+public class InMemoryKeyValueStore<TKey, TState>
+    : IKeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
-    where TValue : notnull
-    where TMetadata : notnull
-    where TState : State<TValue, TMetadata>
+    where TState : StateBase
 {
     private readonly Lock _lock = new();
     private readonly Dictionary<TKey, TState> _store = [];
@@ -32,13 +28,21 @@ public class InMemoryKeyValueStore<TKey, TValue, TMetadata, TState>
     private readonly Dictionary<TKey, DateTimeOffset> _timeToLive = [];
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TValue, TMetadata, TState}"/> class.
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
     /// </summary>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
     public InMemoryKeyValueStore(TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(timeProvider);
         _timeProvider = timeProvider;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
+    /// </summary>
+    public InMemoryKeyValueStore()
+        : this(TimeProvider.System)
+    {
     }
 
     /// <inheritdoc/>
@@ -152,7 +156,7 @@ public class InMemoryKeyValueStore<TKey, TValue, TMetadata, TState>
     }
 
     /// <inheritdoc/>
-    public Task<TState?> TryGetValueAsync(TKey key, CancellationToken cancellationToken)
+    public Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())

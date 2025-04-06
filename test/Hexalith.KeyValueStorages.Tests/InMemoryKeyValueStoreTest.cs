@@ -5,6 +5,8 @@
 
 namespace Hexalith.KeyValueStorages.Tests;
 
+using Hexalith.KeyValueStorages.Exceptions;
+
 using Shouldly;
 
 /// <summary>
@@ -20,13 +22,16 @@ public class InMemoryKeyValueStoreTest
     public async Task AddAsync_ShouldReturnInitialEtag_WhenValueIsAdded()
     {
         // Arrange
-        var value = new InMemoryKeyValueStore<long, long>();
+        var value = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act
-        long result = await value.AddAsync(1, 100, CancellationToken.None);
+        string result = await value.AddAsync(
+            1L,
+            new State<long>(100L),
+            CancellationToken.None);
 
         // Assert
-        result.ShouldBe(1);
+        result.ShouldNotBeNullOrWhiteSpace();
     }
 
     /// <summary>
@@ -37,12 +42,12 @@ public class InMemoryKeyValueStoreTest
     public async Task AddAsync_ShouldThrowInvalidOperationException_WhenKeyAlreadyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
 
         // Act & Assert
-        _ = await Should.ThrowAsync<InvalidOperationException>(
-            async () => await store.AddAsync(1, 200, CancellationToken.None));
+        _ = await Should.ThrowAsync<DuplicateKeyException<long>>(
+            async () => await store.AddAsync(1, new State<long>(200L), CancellationToken.None));
     }
 
     /// <summary>
@@ -53,7 +58,7 @@ public class InMemoryKeyValueStoreTest
     public async Task ContainsKeyAsync_ShouldReturnFalse_WhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
+        var store = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act
         bool result = await store.ContainsKeyAsync(1, CancellationToken.None);
@@ -70,8 +75,8 @@ public class InMemoryKeyValueStoreTest
     public async Task ContainsKeyAsync_ShouldReturnTrue_WhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
 
         // Act
         bool result = await store.ContainsKeyAsync(1, CancellationToken.None);
@@ -88,15 +93,15 @@ public class InMemoryKeyValueStoreTest
     public async Task GetAsync_ShouldReturnValue_WhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
 
         // Act
-        StoreResult<long, long> result = await store.GetAsync(1, CancellationToken.None);
+        State<long> result = await store.GetAsync(1, CancellationToken.None);
 
         // Assert
         result.Value.ShouldBe(100);
-        result.Etag.ShouldBe(1);
+        result.Etag.ShouldNotBeNullOrWhiteSpace();
     }
 
     /// <summary>
@@ -107,7 +112,7 @@ public class InMemoryKeyValueStoreTest
     public async Task GetAsync_ShouldThrowKeyNotFoundException_WhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
+        var store = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act & Assert
         _ = await Should.ThrowAsync<KeyNotFoundException>(
@@ -122,10 +127,10 @@ public class InMemoryKeyValueStoreTest
     public async Task RemoveAsync_ShouldReturnFalse_WhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
+        var store = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act
-        bool result = await store.RemoveAsync(1, 1, CancellationToken.None);
+        bool result = await store.RemoveAsync(1, null, CancellationToken.None);
 
         // Assert
         result.ShouldBeFalse();
@@ -139,11 +144,11 @@ public class InMemoryKeyValueStoreTest
     public async Task RemoveAsync_ShouldReturnTrue_WhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
 
         // Act
-        bool result = await store.RemoveAsync(1, 1, CancellationToken.None);
+        bool result = await store.RemoveAsync(1, null, CancellationToken.None);
 
         // Assert
         result.ShouldBeTrue();
@@ -158,12 +163,15 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsync_ShouldThrowInvalidOperationException_WhenEtagDoesNotMatch()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
 
         // Act & Assert
-        _ = await Should.ThrowAsync<InvalidOperationException>(
-            async () => await store.SetAsync(1, 200, 999, CancellationToken.None));
+        _ = await Should.ThrowAsync<ConcurrencyException<long>>(
+            async () => await store.SetAsync(
+                1,
+                new State<long>(200, "bad etag"),
+                CancellationToken.None));
     }
 
     /// <summary>
@@ -174,11 +182,11 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsync_ShouldThrowKeyNotFoundException_WhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
+        var store = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act & Assert
         _ = await Should.ThrowAsync<KeyNotFoundException>(
-            async () => await store.SetAsync(1, 100, 1, CancellationToken.None));
+            async () => await store.SetAsync(1, new State<long>(100), CancellationToken.None));
     }
 
     /// <summary>
@@ -189,17 +197,18 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsync_ShouldUpdateValueAndReturnNewEtag_WhenKeyExistsAndEtagMatches()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        long etag = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        string etag = await store.AddAsync(1, new State<long>(100), CancellationToken.None);
 
         // Act
-        long newEtag = await store.SetAsync(1, 200, etag, CancellationToken.None);
+        string newEtag = await store.SetAsync(1, new State<long>(200, etag), CancellationToken.None);
 
         // Assert
-        newEtag.ShouldBe(2);
-        StoreResult<long, long> result = await store.GetAsync(1, CancellationToken.None);
+        newEtag.ShouldNotBeNullOrWhiteSpace();
+        newEtag.ShouldNotBe(etag);
+        State<long> result = await store.GetAsync(1, CancellationToken.None);
         result.Value.ShouldBe(200);
-        result.Etag.ShouldBe(2);
+        result.Etag.ShouldNotBeNullOrWhiteSpace();
     }
 
     /// <summary>
@@ -210,10 +219,10 @@ public class InMemoryKeyValueStoreTest
     public async Task TryGetValueAsync_ShouldReturnNull_WhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
+        var store = new InMemoryKeyValueStore<long, State<long>>();
 
         // Act
-        StoreResult<long, long>? result = await store.TryGetValueAsync(1, CancellationToken.None);
+        State<long>? result = await store.TryGetAsync(1, CancellationToken.None);
 
         // Assert
         result.ShouldBeNull();
@@ -227,15 +236,15 @@ public class InMemoryKeyValueStoreTest
     public async Task TryGetValueAsync_ShouldReturnValue_WhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, long>();
-        _ = await store.AddAsync(1, 100, CancellationToken.None);
+        var store = new InMemoryKeyValueStore<long, State<long>>();
+        _ = await store.AddAsync(1, new State<long>(100), CancellationToken.None);
 
         // Act
-        StoreResult<long, long>? result = await store.TryGetValueAsync(1, CancellationToken.None);
+        State<long>? result = await store.TryGetAsync(1, CancellationToken.None);
 
         // Assert
         _ = result.ShouldNotBeNull();
         result.Value.ShouldBe(100);
-        result.Etag.ShouldBe(1);
+        result.Etag.ShouldNotBeNullOrWhiteSpace();
     }
 }
