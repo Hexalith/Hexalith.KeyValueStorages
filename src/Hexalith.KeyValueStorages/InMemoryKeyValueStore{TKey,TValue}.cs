@@ -10,7 +10,7 @@ namespace Hexalith.KeyValueStorages;
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-public class InMemoryKeyValueStore<TKey, TValue> : InMemoryKeyValueStore<TKey, TValue, long>
+public class InMemoryKeyValueStore<TKey, TValue> : InMemoryKeyValueStore<TKey, TValue, Dictionary<string, string>, State>
     where TKey : notnull, IEquatable<TKey>
     where TValue : notnull
 {
