@@ -16,25 +16,5 @@ using System.Runtime.Serialization;
 [DataContract]
 public record CountryState(
     Country Value,
-    TimeSpan? TimeToLive,
-    string? Etag) : State<Country, string>(Value, null, TimeToLive, Etag)
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CountryState"/> class.
-    /// </summary>
-    /// <param name="value"> The country.</param>
-    public CountryState(Country value)
-        : this(value, null, null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CountryState"/> class.
-    /// </summary>
-    /// <param name="value"> The country.</param>
-    /// <param name="etag"> The etag associated with the value.</param>
-    public CountryState(Country value, string etag)
-        : this(value, null, etag)
-    {
-    }
-}
+    TimeSpan? TimeToLive = null,
+    string? Etag = null) : State<Country, string>(Value, null, TimeToLive, Etag);

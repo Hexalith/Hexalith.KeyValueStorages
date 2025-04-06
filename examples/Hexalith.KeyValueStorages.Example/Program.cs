@@ -48,7 +48,7 @@ public static class Program
             // Update the country information
             _ = await memoryStore.SetAsync(
                 "US",
-                new(new("US", "United States of America", "USD"), usEtag),
+                new(new("US", "United States of America", "USD"), null, usEtag),
                 CancellationToken.None);
 
             // Delete a country from the store
