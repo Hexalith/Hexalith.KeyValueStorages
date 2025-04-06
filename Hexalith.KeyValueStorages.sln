@@ -47,13 +47,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{3E
 		examples\README.md = examples\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Example", "examples\Hexalith.KeyValueStorages.Example\Hexalith.KeyValueStorages.Example.csproj", "{52A95C3D-7705-406D-B0F6-C49017FC525F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Abstractions", "src\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj", "{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Files", "src\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj", "{F14297F9-B27F-5D0F-ECC1-FE4546B9AF68}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.DaprComponents", "src\Hexalith.KeyValueStorages.DaprComponents\Hexalith.KeyValueStorages.DaprComponents.csproj", "{FA1298A8-220B-584B-0206-C5E70E38C6ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.JsonExample", "examples\Hexalith.KeyValueStorages.JsonExample\Hexalith.KeyValueStorages.JsonExample.csproj", "{4608AC69-9DDD-30CF-825D-89E46DDD794D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,10 +69,6 @@ Global
 		{A0520529-37CD-4558-8D3C-119DB006D10D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0520529-37CD-4558-8D3C-119DB006D10D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0520529-37CD-4558-8D3C-119DB006D10D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52A95C3D-7705-406D-B0F6-C49017FC525F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,6 +81,10 @@ Global
 		{FA1298A8-220B-584B-0206-C5E70E38C6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA1298A8-220B-584B-0206-C5E70E38C6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA1298A8-220B-584B-0206-C5E70E38C6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,10 +93,10 @@ Global
 		{3929FBF6-EDA1-4CA7-8541-C460D0DCE449} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{466549CC-5EDB-4881-F87F-C720AFD4D468} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
 		{A0520529-37CD-4558-8D3C-119DB006D10D} = {EDB74E69-759C-4EC4-911B-DF6D777A6CFA}
-		{52A95C3D-7705-406D-B0F6-C49017FC525F} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
 		{CCA8A23F-D69E-76DE-5B35-3B61C3C9CE73} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
 		{F14297F9-B27F-5D0F-ECC1-FE4546B9AF68} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
 		{FA1298A8-220B-584B-0206-C5E70E38C6ED} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
+		{4608AC69-9DDD-30CF-825D-89E46DDD794D} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B7376F4-B33A-4BC6-AFCA-C09B437568D7}
