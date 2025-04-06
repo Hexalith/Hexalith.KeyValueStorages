@@ -9,32 +9,62 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Commons.UniqueIds;
+using Hexalith.KeyValueStorages.Exceptions;
+
 /// <summary>
 /// An in-memory implementation of the IKeyValueStore interface.
 /// </summary>
 /// <typeparam name="TKey">The type of the key, must be non-null.</typeparam>
-/// <typeparam name="TValue">The type of the value.</typeparam>
-/// <typeparam name="TEtag">The type of the etag, must be non-null.</typeparam>
-public abstract class InMemoryKeyValueStore<TKey, TValue, TEtag> : IKeyValueStore<TKey, TValue, TEtag>
-    where TEtag : notnull
-    where TKey : notnull
+/// <typeparam name="TState">The type of the state.</typeparam>
+public class InMemoryKeyValueStore<TKey, TState>
+    : IKeyValueStore<TKey, TState>
+    where TKey : notnull, IEquatable<TKey>
+    where TState : StateBase
 {
     private readonly Lock _lock = new();
-    private readonly Dictionary<TKey, (TValue Value, TEtag Etag)> _store = [];
+    private readonly Dictionary<TKey, TState> _store = [];
+    private readonly TimeProvider _timeProvider;
+    private readonly Dictionary<TKey, DateTimeOffset> _timeToLive = [];
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
+    /// </summary>
+    /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
+    public InMemoryKeyValueStore(TimeProvider timeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        _timeProvider = timeProvider;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
+    /// </summary>
+    public InMemoryKeyValueStore()
+        : this(TimeProvider.System)
+    {
+    }
 
     /// <inheritdoc/>
-    public Task<TEtag> AddAsync(TKey key, TValue value, CancellationToken cancellationToken)
+    public Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
+            CheckTimeToLive(key);
             if (_store.ContainsKey(key))
             {
-                throw new InvalidOperationException($"Key {key} already exists.");
+                // The key already exists and has not expired
+                throw new DuplicateKeyException<TKey>(key);
             }
 
-            TEtag etag = GenerateInitialEtag();
-            _store[key] = (value, etag);
+            string etag = string.IsNullOrWhiteSpace(value.Etag) ? UniqueIdHelper.GenerateUniqueStringId() : value.Etag;
+            _store[key] = value with { Etag = etag };
+            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            {
+                _timeToLive[key] = _timeProvider.GetUtcNow().Add(value.TimeToLive.Value);
+            }
+
             return Task.FromResult(etag);
         }
     }
@@ -45,19 +75,27 @@ public abstract class InMemoryKeyValueStore<TKey, TValue, TEtag> : IKeyValueStor
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
-            return Task.FromResult(_store.ContainsKey(key));
+            CheckTimeToLive(key);
+            if (_store.ContainsKey(key))
+            {
+                return Task.FromResult(true);
+            }
+
+            return Task.FromResult(false);
         }
     }
 
     /// <inheritdoc/>
-    public Task<StoreResult<TValue, TEtag>> GetAsync(TKey key, CancellationToken cancellationToken)
+    public Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
-            if (_store.TryGetValue(key, out (TValue Value, TEtag Etag) pair))
+            CheckTimeToLive(key);
+
+            if (_store.TryGetValue(key, out TState? value))
             {
-                return Task.FromResult(new StoreResult<TValue, TEtag>(pair.Value, pair.Etag));
+                return Task.FromResult(value);
             }
 
             throw new KeyNotFoundException($"Key {key} not found.");
@@ -65,62 +103,81 @@ public abstract class InMemoryKeyValueStore<TKey, TValue, TEtag> : IKeyValueStor
     }
 
     /// <inheritdoc/>
-    public Task<bool> RemoveAsync(TKey key, TEtag etag, CancellationToken cancellationToken)
+    public Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
+            CheckTimeToLive(key);
+            if (!_store.TryGetValue(key, out TState? current))
+            {
+                return Task.FromResult(false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(etag) && etag != current.Etag)
+            {
+                throw new ConcurrencyException<TKey>(key, etag, current.Etag);
+            }
+
             return Task.FromResult(_store.Remove(key));
         }
     }
 
     /// <inheritdoc/>
-    public Task<TEtag> SetAsync(TKey key, TValue value, TEtag etag, CancellationToken cancellationToken)
+    public Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
-            if (!_store.TryGetValue(key, out (TValue Value, TEtag Etag) current))
+            CheckTimeToLive(key);
+            if (!_store.TryGetValue(key, out TState? current))
             {
                 throw new KeyNotFoundException($"Key {key} not found.");
             }
 
-            if (!EqualityComparer<TEtag>.Default.Equals(current.Etag, etag))
+            if (!string.IsNullOrWhiteSpace(value.Etag) && value.Etag != current.Etag)
             {
-                throw new InvalidOperationException($"Etag mismatch for key {key}.");
+                throw new ConcurrencyException<TKey>(key, value.Etag, current.Etag);
             }
 
-            TEtag newEtag = GenerateNextEtag(etag);
-            _store[key] = (value, newEtag);
+            string newEtag = UniqueIdHelper.GenerateUniqueStringId();
+            _store[key] = value with { Etag = newEtag };
+            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            {
+                _timeToLive[key] = _timeProvider.GetUtcNow().Add(value.TimeToLive.Value);
+            }
+            else
+            {
+                _ = _timeToLive.Remove(key);
+            }
+
             return Task.FromResult(newEtag);
         }
     }
 
     /// <inheritdoc/>
-    public Task<StoreResult<TValue, TEtag>?> TryGetValueAsync(TKey key, CancellationToken cancellationToken)
+    public Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
-            if (_store.TryGetValue(key, out (TValue Value, TEtag Etag) pair))
+            CheckTimeToLive(key);
+            if (_store.TryGetValue(key, out TState? value))
             {
-                return Task.FromResult<StoreResult<TValue, TEtag>?>(new StoreResult<TValue, TEtag>(pair.Value, pair.Etag));
+                return Task.FromResult<TState?>(value);
             }
 
-            return Task.FromResult<StoreResult<TValue, TEtag>?>(null);
+            return Task.FromResult<TState?>(null);
         }
     }
 
-    /// <summary>
-    /// Generates the initial etag for a new key-value pair.
-    /// </summary>
-    /// <returns>The initial etag.</returns>
-    protected abstract TEtag GenerateInitialEtag();
-
-    /// <summary>
-    /// Generates the next etag based on the previous etag.
-    /// </summary>
-    /// <param name="previousEtag">The previous etag.</param>
-    /// <returns>The next etag.</returns>
-    protected abstract TEtag GenerateNextEtag(TEtag previousEtag);
+    private void CheckTimeToLive(TKey key)
+    {
+        if (_timeToLive.TryGetValue(key, out DateTimeOffset expirationTime) && expirationTime < _timeProvider.GetUtcNow())
+        {
+            // The key exists and has expired
+            _ = _store.Remove(key);
+            _ = _timeToLive.Remove(key);
+        }
+    }
 }

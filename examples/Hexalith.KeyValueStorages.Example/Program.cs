@@ -9,7 +9,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Files;
 
 /// <summary>
@@ -24,23 +23,39 @@ public static class Program
     public static async Task Main()
     {
         // Create an in-memory key-value store with string keys and values
-        var memoryStore = new JsonFileKeyValueStorage<string, Country>("/Tests/KeyValueStorages/Country");
+        var memoryStore = new JsonFileKeyValueStorage<string, CountryState>();
 
         try
         {
             // Add a new country to the store
-            _ = await memoryStore.AddAsync("FR", new("FR", "France", "EUR"), CancellationToken.None);
-            string cnEtag = await memoryStore.AddAsync("CN", new("CN", "China", "CNY"), CancellationToken.None);
-            string usEtag = await memoryStore.AddAsync("US", new("US", "United States", "XXX"), CancellationToken.None);
-            _ = await memoryStore.AddAsync("VN", new("VN", "Vietnam", "VND"), CancellationToken.None);
+            _ = await memoryStore.AddAsync(
+                "FR",
+                new(new("FR", "France", "EUR")),
+                CancellationToken.None);
+            string cnEtag = await memoryStore.AddAsync(
+                "CN",
+                new(new("CN", "China", "CNY")),
+                CancellationToken.None);
+            string usEtag = await memoryStore.AddAsync(
+                "US",
+                new(new("US", "United States", "XXX")),
+                CancellationToken.None);
+            _ = await memoryStore.AddAsync(
+                "VN",
+                new(new("VN", "Vietnam", "VND")),
+                CancellationToken.None);
 
             // Update the country information
-            _ = await memoryStore.SetAsync("US", new("US", "United States of America", "USD"), usEtag, CancellationToken.None);
+            _ = await memoryStore.SetAsync(
+                "US",
+                new(new("US", "United States of America", "USD"), usEtag),
+                CancellationToken.None);
 
             // Delete a country from the store
             _ = await memoryStore.RemoveAsync("CN", cnEtag, CancellationToken.None);
 
-            StoreResult<Country, string> usa = await memoryStore.GetAsync("US", CancellationToken.None);
+            CountryState usa = await memoryStore.GetAsync("US", CancellationToken.None);
+
             Console.WriteLine($"Country: {usa.Value.Name}, Currency: {usa.Value.Currency}, Etag: {usa.Etag}");
         }
         catch (Exception ex)
