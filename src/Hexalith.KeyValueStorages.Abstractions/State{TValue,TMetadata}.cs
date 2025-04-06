@@ -21,14 +21,4 @@ public record State<TValue, TMetadata>(
     TValue Value,
     [property: DataMember(Order = 4)] TMetadata? Metadata,
     TimeSpan? TimeToLive,
-    string? Etag) : State<TValue>(Value, TimeToLive, Etag)
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="State{TValue, TMetadata}"/> class.
-    /// </summary>
-    /// <param name="value">The stored value.</param>
-    public State(TValue value)
-        : this(value, default, null, null)
-    {
-    }
-}
+    string? Etag) : State<TValue>(Value, TimeToLive, Etag);

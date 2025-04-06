@@ -27,7 +27,7 @@ public class InMemoryKeyValueStoreTest
         // Act
         string result = await value.AddAsync(
             1L,
-            new State<long>(100L),
+            new State<long>(100L, null, null),
             CancellationToken.None);
 
         // Assert
@@ -43,11 +43,11 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act & Assert
         _ = await Should.ThrowAsync<DuplicateKeyException<long>>(
-            async () => await store.AddAsync(1, new State<long>(200L), CancellationToken.None));
+            async () => await store.AddAsync(1, new State<long>(200L, null, null), CancellationToken.None));
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
         bool result = await store.ContainsKeyAsync(1, CancellationToken.None);
@@ -94,7 +94,7 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
         State<long> result = await store.GetAsync(1, CancellationToken.None);
@@ -145,7 +145,7 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
         bool result = await store.RemoveAsync(1, null, CancellationToken.None);
@@ -164,13 +164,13 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100L), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act & Assert
         _ = await Should.ThrowAsync<ConcurrencyException<long>>(
             async () => await store.SetAsync(
                 1,
-                new State<long>(200, "bad etag"),
+                new State<long>(200, null, "bad etag"),
                 CancellationToken.None));
     }
 
@@ -186,7 +186,7 @@ public class InMemoryKeyValueStoreTest
 
         // Act & Assert
         _ = await Should.ThrowAsync<KeyNotFoundException>(
-            async () => await store.SetAsync(1, new State<long>(100), CancellationToken.None));
+            async () => await store.SetAsync(1, new State<long>(100L, null, null), CancellationToken.None));
     }
 
     /// <summary>
@@ -198,10 +198,10 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        string etag = await store.AddAsync(1, new State<long>(100), CancellationToken.None);
+        string etag = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
-        string newEtag = await store.SetAsync(1, new State<long>(200, etag), CancellationToken.None);
+        string newEtag = await store.SetAsync(1, new State<long>(200, null, etag), CancellationToken.None);
 
         // Assert
         newEtag.ShouldNotBeNullOrWhiteSpace();
@@ -237,7 +237,7 @@ public class InMemoryKeyValueStoreTest
     {
         // Arrange
         var store = new InMemoryKeyValueStore<long, State<long>>();
-        _ = await store.AddAsync(1, new State<long>(100), CancellationToken.None);
+        _ = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
         State<long>? result = await store.TryGetAsync(1, CancellationToken.None);

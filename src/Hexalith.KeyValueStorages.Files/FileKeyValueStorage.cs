@@ -65,7 +65,13 @@ public abstract class FileKeyValueStorage<TKey, TState>
         TState? state = await ReadAsync(filePath, cancellationToken).ConfigureAwait(false);
         if (state is not null)
         {
-            throw new InvalidOperationException($"Key already exists: {key}");
+            throw new DuplicateKeyException<TKey>(key);
+        }
+
+        string directory = Path.GetDirectoryName(filePath)!;
+        if (!Directory.Exists(directory))
+        {
+            _ = Directory.CreateDirectory(directory);
         }
 
         await using FileStream stream = new(

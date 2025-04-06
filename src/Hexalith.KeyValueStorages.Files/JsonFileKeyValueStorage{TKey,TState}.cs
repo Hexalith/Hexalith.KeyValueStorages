@@ -36,7 +36,7 @@ public class JsonFileKeyValueStorage<TKey, TState> :
             rootPath,
             (s, c) => ReadFromStreamAsync(s, options, c),
             (s, v, c) => WriteToStreamAsync(s, v, options, c),
-            (key) => (keyToFileName(key), subPath),
+            (key) => (subPath, keyToFileName(key)),
             timeProvider)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
@@ -51,7 +51,7 @@ public class JsonFileKeyValueStorage<TKey, TState> :
               "/store",
               null,
               typeof(TState).Name,
-              (key) => key.ToString() ?? throw new ArgumentNullException(nameof(key)),
+              (key) => $"{key.ToString() ?? throw new ArgumentNullException(nameof(key))}.json",
               TimeProvider.System)
     {
     }
@@ -63,7 +63,10 @@ public class JsonFileKeyValueStorage<TKey, TState> :
     /// <param name="options">The JSON serializer options.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous read operation. The task result contains the state.</returns>
-    protected static async Task<TState> ReadFromStreamAsync(Stream stream, JsonSerializerOptions? options, CancellationToken cancellationToken) => await JsonSerializer.DeserializeAsync<TState>(stream, options, cancellationToken)
+    protected static async Task<TState> ReadFromStreamAsync(
+        Stream stream,
+        JsonSerializerOptions? options,
+        CancellationToken cancellationToken) => await JsonSerializer.DeserializeAsync<TState>(stream, options, cancellationToken)
             ?? throw new JsonException("Deserialization returned a null value");
 
     /// <summary>

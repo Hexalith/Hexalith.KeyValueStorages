@@ -18,24 +18,4 @@ using System.Runtime.Serialization;
 public record State<TValue>(
     [property: DataMember(Order = 3)] TValue Value,
     TimeSpan? TimeToLive,
-    string? Etag) : StateBase(TimeToLive, Etag)
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="State{TValue}"/> class.
-    /// </summary>
-    /// <param name="value">The stored value.</param>
-    public State(TValue value)
-        : this(value, null, null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="State{TValue}"/> class.
-    /// </summary>
-    /// <param name="value">The stored value.</param>
-    /// <param name="etag">The etag associated with the value.</param>
-    public State(TValue value, string etag)
-        : this(value, null, etag)
-    {
-    }
-}
+    string? Etag) : StateBase(TimeToLive, Etag);
