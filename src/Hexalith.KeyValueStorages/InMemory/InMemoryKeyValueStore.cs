@@ -19,34 +19,20 @@ using Hexalith.KeyValueStorages.Exceptions;
 /// </summary>
 /// <typeparam name="TKey">The type of the key, must be non-null.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
-/// <remarks>
-/// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
-/// </remarks>
-public class InMemoryKeyValueStore<TKey, TState> : KeyValueStore<TKey, TState>
-    where TKey : notnull, IEquatable<TKey>
-    where TState : StateBase
+/// <param name="database">The name of the database.</param>
+/// <param name="container">The name of the container.</param>
+/// <param name="timeProvider">The time provider to use for managing expiration times.</param>"
+public class InMemoryKeyValueStore<TKey, TState>(
+    [NotNull] string database = "database",
+    string? container = null,
+    TimeProvider? timeProvider = null)
+        : KeyValueStore<TKey, TState>(database, container, timeProvider ?? TimeProvider.System)
+        where TKey : notnull, IEquatable<TKey>
+        where TState : StateBase
 {
     private static readonly Lock _lock = new();
     private static readonly Dictionary<InMemoryKey<TKey>, TState> _store = [];
     private static readonly Dictionary<InMemoryKey<TKey>, DateTimeOffset> _timeToLive = [];
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
-    /// </summary>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
-    /// <param name="timeProvider">The time provider to use for managing expiration times.</param>"
-    public InMemoryKeyValueStore([NotNull] string database, [NotNull] string container, [NotNull] TimeProvider timeProvider)
-        : base(database, container, timeProvider)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
-    /// </summary>
-    public InMemoryKeyValueStore()
-    {
-    }
 
     /// <inheritdoc/>
     public override Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)

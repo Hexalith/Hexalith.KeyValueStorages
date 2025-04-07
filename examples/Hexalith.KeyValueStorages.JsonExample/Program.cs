@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages.Example;
+namespace Hexalith.KeyValueStorages.JsonExample;
 
 using System;
 using System.Threading;
@@ -27,6 +27,8 @@ public static class Program
 
         try
         {
+            Console.WriteLine("JSON File Key-Value Store Examples are created in : " + jsonStore.GetDirectoryPath());
+
             // Add a new country to the store
             _ = await jsonStore.AddAsync(
                 "FR",

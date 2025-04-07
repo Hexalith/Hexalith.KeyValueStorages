@@ -5,7 +5,10 @@
 
 namespace Hexalith.KeyValueStorages.DaprComponents.Extensions;
 
+using System.Diagnostics.CodeAnalysis;
+
 using Hexalith.KeyValueStorages.DaprComponents.Actors;
+using Hexalith.KeyValueStorages.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,30 +18,52 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
+    /// Gets the actor type name for the specified state type, database, and container.
+    /// </summary>
+    /// <typeparam name="TState">The type of the state.</typeparam>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container. If not provided, a default value is used.</param>
+    /// <returns>The actor type name.</returns>
+    public static string ActorType<TState>([NotNull] string database, string? container)
+            where TState : StateBase
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(database);
+        return database + "." + (container ?? StateHelper.GetStateName<TState>());
+    }
+
+    /// <summary>
     /// Registers a typed Dapr actor key-value storage implementation.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <param name="services">The service collection.</param>
-    /// <param name="name">Optional custom actor type name. If not provided, the name is derived from the TValue type name.</param>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container. If not provided, a default value is used.</param>
     /// <param name="keyToActorId">Optional function to convert the key to an actor ID. If not provided, a default conversion is used.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddDaprActorKeyValueStorage<TKey, TState>(
         this IServiceCollection services,
-        string name,
+        string database,
+        string? container = null,
         Func<TKey, string>? keyToActorId = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(database);
         ArgumentNullException.ThrowIfNull(services);
         keyToActorId ??= DaprActorKeyValueStorage<TKey, TState>.KeyToRfc1123;
 
         // Register the actor with the Dapr runtime
-        return services.AddDaprKeyValueStoreActor<TState>(name)
+        return services
+            .AddDaprKeyValueStoreActor<TState>(database, container)
 
             // Register the key-value storage implementation
             .AddSingleton<IKeyValueStore<TKey, TState>>(
-                _ => new DaprActorKeyValueStorage<TKey, TState>(name, keyToActorId));
+                sp => new DaprActorKeyValueStorage<TKey, TState>(
+                    database,
+                    container,
+                    keyToActorId,
+                    sp.GetRequiredService<TimeProvider>()));
     }
 
     /// <summary>
@@ -46,13 +71,18 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <param name="services">The service collection.</param>
-    /// <param name="name">Optional custom actor type name.</param>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container. If not provided, a default value is used.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddDaprKeyValueStoreActor<TState>(this IServiceCollection services, string name)
+    public static IServiceCollection AddDaprKeyValueStoreActor<TState>(
+        this IServiceCollection services,
+        string database,
+        string? container = null)
         where TState : StateBase
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(database);
         services.AddActors(options =>
-            options.Actors.RegisterActor<KeyValueStoreActor<TState>>(name));
+            options.Actors.RegisterActor<KeyValueStoreActor<TState>>(ActorType<TState>(database, container)));
         return services;
     }
 }

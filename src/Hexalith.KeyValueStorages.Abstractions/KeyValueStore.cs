@@ -7,6 +7,7 @@ namespace Hexalith.KeyValueStorages;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,59 +20,47 @@ public abstract class KeyValueStore<TKey, TState> : IKeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
-    private IServiceProvider? _services;
-    private TimeProvider? _timeProvider;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeyValueStore{TKey, TState}"/> class.
-    /// </summary>
-    protected KeyValueStore()
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="KeyValueStore{TKey, TState}"/> class.
     /// </summary>
     /// <param name="database">The name of the database.</param>
     /// <param name="container">The name of the container.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    protected KeyValueStore([NotNull] string database, [NotNull] string container, [NotNull] TimeProvider timeProvider)
+    protected KeyValueStore([NotNull] string database, string? container, TimeProvider? timeProvider)
     {
-        ArgumentNullException.ThrowIfNull(timeProvider);
         ArgumentException.ThrowIfNullOrWhiteSpace(database);
-        ArgumentException.ThrowIfNullOrWhiteSpace(container);
-        _timeProvider = timeProvider;
-        Container = container;
+
+        // If container is null or empty, use DataContract attribute name or type name
+        if (string.IsNullOrWhiteSpace(container))
+        {
+            Container = typeof(TState)
+                .GetCustomAttributes(typeof(DataContractAttribute), true)
+                .OfType<DataContractAttribute>()
+                .FirstOrDefault()?.Name ?? typeof(TState).Name;
+        }
+        else
+        {
+            Container = container;
+        }
+
+        TimeProvider = timeProvider ?? TimeProvider.System;
         Database = database;
     }
 
     /// <summary>
     /// Gets the container name.
     /// </summary>
-    public string Container { get; internal set; } = nameof(Container);
+    public string Container { get; }
 
     /// <summary>
     /// Gets the database name.
     /// </summary>
-    public string Database { get; internal set; } = nameof(Container);
-
-    /// <summary>
-    /// Gets or sets the service provider used by the key-value store.
-    /// </summary>
-    internal IServiceProvider Services
-    {
-        get => _services ?? throw new InvalidOperationException("KeyValueStore service provider is not initialized");
-        set => _services = value;
-    }
+    public string Database { get; }
 
     /// <summary>
     /// Gets the time provider, using the service provider if not already set.
     /// </summary>
-    protected TimeProvider TimeProvider
-        => _timeProvider ??= _services is null
-                ? TimeProvider.System
-                : Services.GetService(typeof(TimeProvider)) as TimeProvider
-                    ?? throw new InvalidOperationException("KeyValueStore time provider is missing in the service provider");
+    protected TimeProvider TimeProvider { get; }
 
     /// <inheritdoc/>
     public abstract Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken);

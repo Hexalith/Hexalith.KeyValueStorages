@@ -25,30 +25,34 @@ public class DaprActorKeyValueStorage<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
-    private readonly string _actorType;
     private readonly Func<TKey, string> _keyToActorId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DaprActorKeyValueStorage{TKey, TState}"/> class.
     /// </summary>
-    /// <param name="name">The name of the actor type.</param>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
     /// <param name="keyToActorId">The function to convert the key to an actor ID.</param>
-    public DaprActorKeyValueStorage(string name, Func<TKey, string> keyToActorId)
+    /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
+    public DaprActorKeyValueStorage(string database, string? container, Func<TKey, string> keyToActorId, TimeProvider? timeProvider = null)
+        : base(database, container, timeProvider)
     {
         ArgumentNullException.ThrowIfNull(keyToActorId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        _actorType = name;
         _keyToActorId = keyToActorId;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DaprActorKeyValueStorage{TKey, TState}"/> class.
     /// </summary>
-    /// <param name="name">The name of the actor type.</param>
-    public DaprActorKeyValueStorage(string name)
-        : this(name, KeyToRfc1123)
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
+    /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
+    public DaprActorKeyValueStorage(string database, string? container, TimeProvider? timeProvider)
+        : this(database, container, KeyToRfc1123, timeProvider)
     {
     }
+
+    private string ActorType => Database + "." + Container;
 
     /// <summary>
     /// Converts the key to an RFC 1123 string representation for use as an actor ID.
@@ -93,5 +97,5 @@ public class DaprActorKeyValueStorage<TKey, TState>
         => await GetActor(key).TryGetAsync(cancellationToken).ConfigureAwait(false);
 
     private IKeyValueStoreActor<TState> GetActor(TKey key)
-        => ActorProxy.Create<IKeyValueStoreActor<TState>>(new(_keyToActorId(key)), _actorType);
+        => ActorProxy.Create<IKeyValueStoreActor<TState>>(new(_keyToActorId(key)), ActorType);
 }

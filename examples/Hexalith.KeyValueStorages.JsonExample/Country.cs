@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages.Example;
+namespace Hexalith.KeyValueStorages.JsonExample;
 
 using System.Runtime.Serialization;
 

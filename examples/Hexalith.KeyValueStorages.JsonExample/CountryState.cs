@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages.Example;
+namespace Hexalith.KeyValueStorages.JsonExample;
 
 using System.Runtime.Serialization;
 
@@ -13,7 +13,7 @@ using System.Runtime.Serialization;
 /// <param name="Value"> The country.</param>
 /// <param name="TimeToLive"> The time to live for the value.</param>
 /// <param name="Etag"> The etag associated with the value.</param>
-[DataContract]
+[DataContract(Name = nameof(Country))]
 public record CountryState(
     Country Value,
     TimeSpan? TimeToLive = null,

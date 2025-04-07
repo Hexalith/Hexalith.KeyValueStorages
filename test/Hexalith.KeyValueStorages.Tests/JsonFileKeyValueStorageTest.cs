@@ -39,8 +39,9 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
         _storage = new JsonFileKeyValueStorage<string, State<DummyValue>>(
             _testDirectory,
+            "TestDatabase",
+            null,
             new JsonSerializerOptions { WriteIndented = true },
-            "DummyValues",
             key => key + ".json",
             _timeProvider);
     }
@@ -67,7 +68,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
 
         // Assert
         result.ShouldNotBeNullOrWhiteSpace();
-        File.Exists(Path.Combine(_testDirectory, "DummyValues", "key1.json")).ShouldBeTrue();
+        File.Exists(_storage.GetFilePath("key1")).ShouldBeTrue();
     }
 
     /// <summary>

@@ -22,26 +22,26 @@ public class JsonFileKeyValueStorage<TKey, TState> :
     /// Initializes a new instance of the <see cref="JsonFileKeyValueStorage{TKey, TValue}"/> class.
     /// </summary>
     /// <param name="rootPath">The root path for storing files.</param>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
     /// <param name="options">The JSON serializer options.</param>
-    /// <param name="subPath">The sub-path for storing files.</param>
     /// <param name="keyToFileName">The function to convert the key to a file name.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
     public JsonFileKeyValueStorage(
         string rootPath,
+        string database,
+        string? container,
         JsonSerializerOptions? options,
-        string subPath,
         Func<TKey, string> keyToFileName,
-        TimeProvider timeProvider)
+        TimeProvider? timeProvider)
         : base(
             rootPath,
+            database,
+            container,
             (s, c) => ReadFromStreamAsync(s, options, c),
             (s, v, c) => WriteToStreamAsync(s, v, options, c),
-            (key) => (subPath, keyToFileName(key)),
-            timeProvider)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
-        ArgumentNullException.ThrowIfNull(timeProvider);
-    }
+            keyToFileName,
+            timeProvider) => ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JsonFileKeyValueStorage{TKey, TValue}"/> class.
@@ -49,10 +49,11 @@ public class JsonFileKeyValueStorage<TKey, TState> :
     public JsonFileKeyValueStorage()
         : this(
               "/store",
+              "database",
               null,
-              typeof(TState).Name,
+              null,
               (key) => $"{key.ToString() ?? throw new ArgumentNullException(nameof(key))}.json",
-              TimeProvider.System)
+              null)
     {
     }
 

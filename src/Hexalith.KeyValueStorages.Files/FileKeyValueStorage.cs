@@ -24,37 +24,39 @@ public abstract class FileKeyValueStorage<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
-    private readonly Func<TKey, (string SubPath, string FileName)> _keyToFileName;
+    private readonly Func<TKey, string> _keyToFileName;
     private readonly Func<Stream, CancellationToken, Task<TState>> _readFromStream;
     private readonly string _rootPath;
-    private readonly TimeProvider _timeProvider;
     private readonly Func<Stream, TState, CancellationToken, Task> _writeToStream;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileKeyValueStorage{TKey, TState}"/> class.
     /// </summary>
     /// <param name="rootPath">The root path for storing files.</param>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
     /// <param name="readFromStream">The function to read the value from the file.</param>
     /// <param name="writeToStream">The function to write the value to the file.</param>
     /// <param name="keyToFileName">The function to convert the key to a file name.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
     protected FileKeyValueStorage(
         string rootPath,
+        string database,
+        string? container,
         Func<Stream, CancellationToken, Task<TState>> readFromStream,
         Func<Stream, TState, CancellationToken, Task> writeToStream,
-        Func<TKey, (string SubPath, string FileName)> keyToFileName,
-        TimeProvider timeProvider)
+        Func<TKey, string> keyToFileName,
+        TimeProvider? timeProvider)
+        : base(database, container, timeProvider)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
         ArgumentNullException.ThrowIfNull(readFromStream);
         ArgumentNullException.ThrowIfNull(writeToStream);
         ArgumentNullException.ThrowIfNull(keyToFileName);
-        ArgumentNullException.ThrowIfNull(timeProvider);
         _rootPath = rootPath;
         _readFromStream = readFromStream;
         _writeToStream = writeToStream;
         _keyToFileName = keyToFileName;
-        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc/>
@@ -68,7 +70,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
             throw new DuplicateKeyException<TKey>(key);
         }
 
-        string directory = Path.GetDirectoryName(filePath)!;
+        string directory = GetDirectoryPath();
         if (!Directory.Exists(directory))
         {
             _ = Directory.CreateDirectory(directory);
@@ -94,6 +96,23 @@ public abstract class FileKeyValueStorage<TKey, TState>
     public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Key not found: {key}");
+
+    /// <summary>
+    /// Gets the directory path for the storage.
+    /// </summary>
+    /// <returns>The directory path.</returns>
+    public string GetDirectoryPath() => Path.Combine(_rootPath, Database, Container);
+
+    /// <summary>
+    /// Gets the file path for the specified key.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>The file path.</returns>
+    public string GetFilePath(TKey key)
+    {
+        string fileName = _keyToFileName(key);
+        return Path.Combine(GetDirectoryPath(), fileName);
+    }
 
     /// <inheritdoc/>
     public override async Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
@@ -143,17 +162,6 @@ public abstract class FileKeyValueStorage<TKey, TState>
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
-    /// Gets the file path for the specified key.
-    /// </summary>
-    /// <param name="key">The key.</param>
-    /// <returns>The file path.</returns>
-    protected string GetFilePath(TKey key)
-    {
-        (string subPath, string fileName) = _keyToFileName(key);
-        return Path.Combine(_rootPath, subPath, fileName);
-    }
-
-    /// <summary>
     /// Reads the value from the file.
     /// </summary>
     /// <param name="filePath">The file path.</param>
@@ -200,7 +208,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
         TState state = await ReadValueFromFileAsync(filePath, cancellationToken).ConfigureAwait(false);
         if (state.TimeToLive is not null &&
             state.TimeToLive.Value > TimeSpan.Zero &&
-            File.GetLastWriteTimeUtc(filePath).Add(state.TimeToLive.Value) < _timeProvider.GetUtcNow().UtcDateTime)
+            File.GetLastWriteTimeUtc(filePath).Add(state.TimeToLive.Value) < TimeProvider.GetUtcNow().UtcDateTime)
         {
             // The file time to live has expired, delete it
             File.Delete(filePath);
