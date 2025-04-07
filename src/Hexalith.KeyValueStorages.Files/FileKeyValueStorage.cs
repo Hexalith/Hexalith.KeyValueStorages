@@ -20,7 +20,7 @@ using Hexalith.KeyValueStorages.Exceptions;
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
 public abstract class FileKeyValueStorage<TKey, TState>
-    : IKeyValueStore<TKey, TState>
+    : KeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
@@ -58,7 +58,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     }
 
     /// <inheritdoc/>
-    public async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)
+    public override async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
         string filePath = GetFilePath(key);
 
@@ -87,16 +87,16 @@ public abstract class FileKeyValueStorage<TKey, TState>
     }
 
     /// <inheritdoc/>
-    public async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false) is not null;
 
     /// <inheritdoc/>
-    public async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Key not found: {key}");
 
     /// <inheritdoc/>
-    public async Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
+    public override async Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -120,7 +120,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     }
 
     /// <inheritdoc/>
-    public async Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken)
+    public override async Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
         string filePath = GetFilePath(key);
 
@@ -139,7 +139,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     }
 
     /// <inheritdoc/>
-    public async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false);
 
     /// <summary>

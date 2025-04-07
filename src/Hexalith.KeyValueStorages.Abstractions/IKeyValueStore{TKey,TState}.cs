@@ -10,7 +10,7 @@ namespace Hexalith.KeyValueStorages;
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the store. Must be non-nullable.</typeparam>
 /// <typeparam name="TState">The type of the state associated with the values.</typeparam>
-public interface IKeyValueStore<TKey, TState>
+public interface IKeyValueStore<TKey, TState> : IKeyValueStore
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {

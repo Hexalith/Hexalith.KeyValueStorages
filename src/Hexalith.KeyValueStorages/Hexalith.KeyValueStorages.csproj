@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Hexalith.Commons.UniqueIds" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj" />

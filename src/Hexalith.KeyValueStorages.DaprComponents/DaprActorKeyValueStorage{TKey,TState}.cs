@@ -21,7 +21,7 @@ using Hexalith.KeyValueStorages.DaprComponents.Actors;
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
 public class DaprActorKeyValueStorage<TKey, TState>
-    : IKeyValueStore<TKey, TState>
+    : KeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
@@ -71,25 +71,25 @@ public class DaprActorKeyValueStorage<TKey, TState>
     }
 
     /// <inheritdoc/>
-    public async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken) => await GetActor(key).AddAsync(value, cancellationToken).ConfigureAwait(false);
+    public override async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken) => await GetActor(key).AddAsync(value, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken) => (await GetActor(key).TryGetAsync(cancellationToken).ConfigureAwait(false)) != null;
+    public override async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken) => (await GetActor(key).TryGetAsync(cancellationToken).ConfigureAwait(false)) != null;
 
     /// <inheritdoc/>
-    public async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken) => await GetActor(key).GetAsync(cancellationToken).ConfigureAwait(false);
+    public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken) => await GetActor(key).GetAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
+    public override async Task<bool> RemoveAsync(TKey key, string? etag, CancellationToken cancellationToken)
         => string.IsNullOrWhiteSpace(etag)
             ? await GetActor(key).RemoveAsync(cancellationToken).ConfigureAwait(false)
             : await GetActor(key).RemoveAsync(etag, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken) => await GetActor(key).SetAsync(value, cancellationToken).ConfigureAwait(false);
+    public override async Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken) => await GetActor(key).SetAsync(value, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
         => await GetActor(key).TryGetAsync(cancellationToken).ConfigureAwait(false);
 
     private IKeyValueStoreActor<TState> GetActor(TKey key)
