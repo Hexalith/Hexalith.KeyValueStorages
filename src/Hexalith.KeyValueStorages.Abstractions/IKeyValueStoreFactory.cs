@@ -13,13 +13,30 @@ using System;
 public interface IKeyValueStoreFactory
 {
     /// <summary>
+    /// The default name for the key-value store.
+    /// </summary>
+    const string Default = "default";
+
+    /// <summary>
     /// Creates a new instance of <see cref="IKeyValueStore{TKey, TState}"/>.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <param name="name">The name of the key-value store.</param>
     /// <returns>A new instance of <see cref="IKeyValueStore{TKey, TState}"/>.</returns>
-    IKeyValueStore<TKey, TState> Create<TKey, TState>(string name = "data")
-                where TKey : notnull, IEquatable<TKey>
-                where TState : StateBase;
+    IKeyValueStore<TKey, TState> Create<TKey, TState>(string name = Default)
+        where TKey : notnull, IEquatable<TKey>
+        where TState : StateBase;
+
+    /// <summary>
+    /// Creates a new instance of <see cref="IKeyValueStore{TKey, TState}"/>.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TState">The type of the state.</typeparam>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
+    /// <returns>A new instance of <see cref="IKeyValueStore{TKey, TState}"/>.</returns>
+    IKeyValueStore<TKey, TState> Create<TKey, TState>(string database, string container)
+        where TKey : notnull, IEquatable<TKey>
+        where TState : StateBase;
 }
