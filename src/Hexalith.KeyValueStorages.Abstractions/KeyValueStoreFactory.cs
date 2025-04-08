@@ -10,16 +10,16 @@ using System;
 /// <summary>
 /// Factory class for creating instances of key-value stores.
 /// </summary>
-public class KeyValueStoreFactory : IKeyValueStoreFactory
+public class KeyValueStoreFactory : IKeyValueFactory
 {
     /// <summary>
     /// Creates a key-value store with the specified name.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TState">The type of the state.</typeparam>
-    /// <param name="name">The name of the key-value store. Defaults to <see cref="IKeyValueStoreFactory.Default"/>.</param>
+    /// <param name="name">The name of the key-value store. Defaults to <see cref="IKeyValueFactory.Default"/>.</param>
     /// <returns>An instance of <see cref="IKeyValueStore{TKey, TState}"/>.</returns>
-    public IKeyValueStore<TKey, TState> Create<TKey, TState>(string name = IKeyValueStoreFactory.Default)
+    public IKeyValueStore<TKey, TState> Create<TKey, TState>(string name = IKeyValueFactory.Default)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase => throw new NotImplementedException();
 

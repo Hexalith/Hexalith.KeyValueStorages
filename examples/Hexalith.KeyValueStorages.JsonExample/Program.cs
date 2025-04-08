@@ -23,7 +23,7 @@ public static class Program
     public static async Task Main()
     {
         // Create JSON file key-value store with string keys and values
-        var jsonStore = new JsonFileKeyValueStorage<string, CountryState>();
+        var jsonStore = new JsonFileKeyValueStore<string, CountryState>();
 
         try
         {

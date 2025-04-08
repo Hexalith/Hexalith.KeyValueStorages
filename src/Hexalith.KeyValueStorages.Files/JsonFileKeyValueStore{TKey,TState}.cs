@@ -1,0 +1,67 @@
+﻿// <copyright file="JsonFileKeyValueStore{TKey,TState}.cs" company="ITANEO">
+// Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+
+namespace Hexalith.KeyValueStorages.Files;
+
+using System;
+using System.Text.Json;
+
+using Microsoft.Extensions.Options;
+
+/// <summary>
+/// Represents a key-value storage that uses JSON files for persistence.
+/// </summary>
+/// <typeparam name="TKey">The type of the key.</typeparam>
+/// <typeparam name="TState">The type of the state.</typeparam>
+/// <remarks>
+/// Initializes a new instance of the <see cref="JsonFileKeyValueStore{TKey, TValue}"/> class.
+/// </remarks>
+/// <param name="settings">The settings for the file key-value store.</param>
+/// <param name="database">The name of the database.</param>
+/// <param name="container">The name of the container.</param>
+/// <param name="options">The JSON serializer options.</param>
+/// <param name="timeProvider">The time provider to use for managing expiration times.</param>
+public class JsonFileKeyValueStore<TKey, TState>(
+    IOptions<FileKeyValueStoreSettings> settings,
+    string? database = null,
+    string? container = null,
+    JsonSerializerOptions? options = null,
+    TimeProvider? timeProvider = null) :
+    FileKeyValueStorage<TKey, TState>(
+        settings,
+        database,
+        container,
+        timeProvider)
+    where TKey : notnull, IEquatable<TKey>
+    where TState : StateBase
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonFileKeyValueStore{TKey, TValue}"/> class.
+    /// </summary>
+    public JsonFileKeyValueStore()
+        : this(
+              Options.Create<FileKeyValueStoreSettings>(new()),
+              "database",
+              null,
+              null,
+              null)
+    {
+    }
+
+    /// <inheritdoc/>
+    protected override string KeyToFileName(TKey key) => $"{key.ToString() ?? throw new ArgumentNullException(nameof(key))}.json";
+
+    /// <inheritdoc/>
+    protected override async Task<TState> ReadFromStreamAsync(Stream stream, CancellationToken cancellationToken)
+        => await JsonSerializer.DeserializeAsync<TState>(stream, options, cancellationToken)
+            ?? throw new JsonException("Deserialization returned a null value");
+
+    /// <inheritdoc/>
+    protected override async Task WriteToStreamAsync(Stream stream, TState value, CancellationToken cancellationToken)
+    {
+        await JsonSerializer.SerializeAsync(stream, value, options, cancellationToken);
+        await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+}

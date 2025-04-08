@@ -1,4 +1,4 @@
-﻿// <copyright file="IKeyValueStoreFactory.cs" company="ITANEO">
+﻿// <copyright file="IKeyValueFactory.cs" company="ITANEO">
 // Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -10,7 +10,7 @@ using System;
 /// <summary>
 /// Factory interface for creating instances of <see cref="IKeyValueStore{TKey, TState}"/>.
 /// </summary>
-public interface IKeyValueStoreFactory
+public interface IKeyValueFactory
 {
     /// <summary>
     /// The default name for the key-value store.

@@ -1,4 +1,4 @@
-// <copyright file="DaprActorKeyValueStorage{TKey,TState}.cs" company="ITANEO">
+// <copyright file="DaprActorKeyValueStore{TKey,TState}.cs" company="ITANEO">
 // Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -20,7 +20,7 @@ using Hexalith.KeyValueStorages.DaprComponents.Actors;
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
-public class DaprActorKeyValueStorage<TKey, TState>
+public class DaprActorKeyValueStore<TKey, TState>
     : KeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
@@ -28,13 +28,13 @@ public class DaprActorKeyValueStorage<TKey, TState>
     private readonly Func<TKey, string> _keyToActorId;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DaprActorKeyValueStorage{TKey, TState}"/> class.
+    /// Initializes a new instance of the <see cref="DaprActorKeyValueStore{TKey, TState}"/> class.
     /// </summary>
     /// <param name="database">The name of the database.</param>
     /// <param name="container">The name of the container.</param>
     /// <param name="keyToActorId">The function to convert the key to an actor ID.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    public DaprActorKeyValueStorage(string database, string? container, Func<TKey, string> keyToActorId, TimeProvider? timeProvider = null)
+    public DaprActorKeyValueStore(string database, string? container, Func<TKey, string> keyToActorId, TimeProvider? timeProvider = null)
         : base(database, container, timeProvider)
     {
         ArgumentNullException.ThrowIfNull(keyToActorId);
@@ -42,12 +42,12 @@ public class DaprActorKeyValueStorage<TKey, TState>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DaprActorKeyValueStorage{TKey, TState}"/> class.
+    /// Initializes a new instance of the <see cref="DaprActorKeyValueStore{TKey, TState}"/> class.
     /// </summary>
     /// <param name="database">The name of the database.</param>
     /// <param name="container">The name of the container.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    public DaprActorKeyValueStorage(string database, string? container, TimeProvider? timeProvider)
+    public DaprActorKeyValueStore(string database, string? container, TimeProvider? timeProvider)
         : this(database, container, KeyToRfc1123, timeProvider)
     {
     }

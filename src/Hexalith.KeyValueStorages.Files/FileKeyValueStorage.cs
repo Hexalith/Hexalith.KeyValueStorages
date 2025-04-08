@@ -10,9 +10,12 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Commons.Configurations;
 using Hexalith.Commons.UniqueIds;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Exceptions;
+
+using Microsoft.Extensions.Options;
 
 /// <summary>
 /// File based key-value storage implementation.
@@ -24,39 +27,24 @@ public abstract class FileKeyValueStorage<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
-    private readonly Func<TKey, string> _keyToFileName;
-    private readonly Func<Stream, CancellationToken, Task<TState>> _readFromStream;
     private readonly string _rootPath;
-    private readonly Func<Stream, TState, CancellationToken, Task> _writeToStream;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileKeyValueStorage{TKey, TState}"/> class.
     /// </summary>
-    /// <param name="rootPath">The root path for storing files.</param>
+    /// <param name="settings">The settings for the file key-value store.</param>
     /// <param name="database">The name of the database.</param>
     /// <param name="container">The name of the container.</param>
-    /// <param name="readFromStream">The function to read the value from the file.</param>
-    /// <param name="writeToStream">The function to write the value to the file.</param>
-    /// <param name="keyToFileName">The function to convert the key to a file name.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
     protected FileKeyValueStorage(
-        string rootPath,
-        string database,
-        string? container,
-        Func<Stream, CancellationToken, Task<TState>> readFromStream,
-        Func<Stream, TState, CancellationToken, Task> writeToStream,
-        Func<TKey, string> keyToFileName,
-        TimeProvider? timeProvider)
-        : base(database, container, timeProvider)
+        IOptions<FileKeyValueStoreSettings> settings,
+        string? database = null,
+        string? container = null,
+        TimeProvider? timeProvider = null)
+        : base(GetDatabase(database, settings), container, timeProvider)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
-        ArgumentNullException.ThrowIfNull(readFromStream);
-        ArgumentNullException.ThrowIfNull(writeToStream);
-        ArgumentNullException.ThrowIfNull(keyToFileName);
-        _rootPath = rootPath;
-        _readFromStream = readFromStream;
-        _writeToStream = writeToStream;
-        _keyToFileName = keyToFileName;
+        SettingsException<FileKeyValueStoreSettings>.ThrowIfUndefined(settings.Value.StorageRootPath);
+        _rootPath = settings.Value.StorageRootPath;
     }
 
     /// <inheritdoc/>
@@ -82,7 +70,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
             FileAccess.Write,
             FileShare.None);
         string etag = string.IsNullOrWhiteSpace(value.Etag) ? UniqueIdHelper.GenerateUniqueStringId() : value.Etag;
-        await _writeToStream(stream, value with { Etag = etag }, cancellationToken).ConfigureAwait(false);
+        await WriteToStreamAsync(stream, value with { Etag = etag }, cancellationToken).ConfigureAwait(false);
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
 
         return etag;
@@ -110,7 +98,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// <returns>The file path.</returns>
     public string GetFilePath(TKey key)
     {
-        string fileName = _keyToFileName(key);
+        string fileName = KeyToFileName(key);
         return Path.Combine(GetDirectoryPath(), fileName);
     }
 
@@ -162,6 +150,21 @@ public abstract class FileKeyValueStorage<TKey, TState>
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
+    /// Converts the specified key to a file name.
+    /// </summary>
+    /// <param name="key">The key to convert.</param>
+    /// <returns>The file name corresponding to the key.</returns>
+    protected abstract string KeyToFileName(TKey key);
+
+    /// <summary>
+    /// Reads the state object from the provided stream asynchronously.
+    /// </summary>
+    /// <param name="stream">The stream to read the state object from.</param>
+    /// <param name="cancellationToken">The cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous read operation. The task result contains the deserialized state object.</returns>
+    protected abstract Task<TState> ReadFromStreamAsync(Stream stream, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Reads the value from the file.
     /// </summary>
     /// <param name="filePath">The file path.</param>
@@ -170,7 +173,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     protected async Task<TState> ReadValueFromFileAsync(string filePath, CancellationToken cancellationToken)
     {
         await using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return await _readFromStream(stream, cancellationToken).ConfigureAwait(false);
+        return await ReadFromStreamAsync(stream, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -185,6 +188,15 @@ public abstract class FileKeyValueStorage<TKey, TState>
     }
 
     /// <summary>
+    /// Writes the specified value to the provided stream asynchronously.
+    /// </summary>
+    /// <param name="stream">The stream to write the value to.</param>
+    /// <param name="value">The value to write to the stream.</param>
+    /// <param name="cancellationToken">The cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous write operation.</returns>
+    protected abstract Task WriteToStreamAsync(Stream stream, TState value, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Writes the value to the file.
     /// </summary>
     /// <param name="filePath">The file path.</param>
@@ -194,8 +206,19 @@ public abstract class FileKeyValueStorage<TKey, TState>
     protected async Task WriteValueToFileAsync(string filePath, TState value, CancellationToken cancellationToken)
     {
         await using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await _writeToStream(stream, value, cancellationToken).ConfigureAwait(false);
+        await WriteToStreamAsync(stream, value, cancellationToken).ConfigureAwait(false);
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private static string GetDatabase(string? database, IOptions<FileKeyValueStoreSettings> settings)
+    {
+        if (string.IsNullOrWhiteSpace(database))
+        {
+            SettingsException<FileKeyValueStoreSettings>.ThrowIfUndefined(settings.Value.Database);
+            return settings.Value.Database;
+        }
+
+        return database;
     }
 
     private async Task<TState?> ReadAsync(string filePath, CancellationToken cancellationToken)

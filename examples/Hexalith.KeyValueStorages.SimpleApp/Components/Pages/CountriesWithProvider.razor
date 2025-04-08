@@ -1,0 +1,72 @@
+﻿@page "/"
+@page "/countries-with-provider"
+
+<PageTitle>Countries</PageTitle>
+
+
+@code
+{
+	[Inject(Key = "sample")]
+	required public IKeyValueProvider DataProvider { get; set; }
+
+	private IKeyValueStore<string, CountryState>? _countriesStore;
+	private IKeyValueStore<string, CountryState> CountriesStore
+		=> _countriesStore ??= DataProvider.Create<string, CountryState>("testdb", "country");
+
+	private IKeyValueStore<string, CountryIndexState>? _countryIdsStore;
+	private IKeyValueStore<string, CountryIndexState> CountryIdsStore
+		=> _countryIdsStore ??= DataProvider.Create<string, CountryIndexState>("testdb", "country");
+
+	List<CountryState> countries = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var ids = await CountryIdsStore.GetAsync("All", CancellationToken.None);
+		if (ids is null)
+		{
+			countries = new List<CountryState>();
+			return;
+		}
+
+		var countryIds = ids.Value;
+		var countryTasks = new List<Task<CountryState>>();
+		foreach (var id in countryIds)
+		{
+			countryTasks.Add(CountriesStore.GetAsync(id, CancellationToken.None));
+		}
+		countries = (await Task.WhenAll(countryTasks)).ToList();
+	}
+	private async Task DeleteCountry(string code)
+	{
+		var country = countries.First(p => p.Value.Code == code);
+		await CountriesStore.RemoveAsync(country.Value.Code, country.Etag, CancellationToken.None);
+		var ids = await CountryIdsStore.GetAsync("All", CancellationToken.None);
+		await CountryIdsStore.SetAsync(
+			"All",
+			new CountryIndexState(ids.Value.Where(p => p != country.Value.Code).ToList()),
+			CancellationToken.None);
+		countries.Remove(country);
+	}
+	private async Task AddCountry(CountryState country)
+	{
+		if (countries.Any(p => p.Value.Code == country.Value.Code))
+			return;
+		var ids = await CountryIdsStore.GetAsync("All", CancellationToken.None);
+		await CountryIdsStore.SetAsync(
+			"All",
+			new CountryIndexState(ids.Value.Append(country.Value.Code).ToList()),
+			CancellationToken.None);
+		var etag = await CountriesStore.AddAsync(country.Value.Code, country, CancellationToken.None);
+		countries.Add(country with { Etag = etag });
+	}
+	private async Task UpdateCountry(CountryState country)
+	{
+		var existing = countries.FirstOrDefault(p => p.Value.Code == country.Value.Code);
+		if (existing is null)
+			return;
+		await CountriesStore.SetAsync(country.Value.Code, country, CancellationToken.None);
+		countries.Remove(existing);
+		countries.Add (country);
+	}
+}
+

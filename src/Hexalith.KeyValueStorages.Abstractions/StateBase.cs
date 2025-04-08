@@ -14,5 +14,5 @@ using System.Runtime.Serialization;
 /// <param name="Etag">The etag associated with the value.</param>
 [DataContract]
 public record StateBase(
-    [property: DataMember(Order = 1)] TimeSpan? TimeToLive,
-    [property: DataMember(Order = 2)] string? Etag);
+    [property: DataMember(Order = 2)] string? Etag,
+    [property: DataMember(Order = 1)] TimeSpan? TimeToLive);

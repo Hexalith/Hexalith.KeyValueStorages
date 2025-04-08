@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.JsonExample", "examples\Hexalith.KeyValueStorages.JsonExample\Hexalith.KeyValueStorages.JsonExample.csproj", "{4608AC69-9DDD-30CF-825D-89E46DDD794D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.SimpleApp", "examples\Hexalith.KeyValueStorages.SimpleApp\Hexalith.KeyValueStorages.SimpleApp.csproj", "{1EA072D4-378E-454E-A282-8368F85DDD64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4608AC69-9DDD-30CF-825D-89E46DDD794D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EA072D4-378E-454E-A282-8368F85DDD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EA072D4-378E-454E-A282-8368F85DDD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EA072D4-378E-454E-A282-8368F85DDD64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EA072D4-378E-454E-A282-8368F85DDD64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +103,7 @@ Global
 		{F14297F9-B27F-5D0F-ECC1-FE4546B9AF68} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
 		{FA1298A8-220B-584B-0206-C5E70E38C6ED} = {2E1479EA-06ED-4A69-8F50-F17804066FA6}
 		{4608AC69-9DDD-30CF-825D-89E46DDD794D} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
+		{1EA072D4-378E-454E-A282-8368F85DDD64} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B7376F4-B33A-4BC6-AFCA-C09B437568D7}

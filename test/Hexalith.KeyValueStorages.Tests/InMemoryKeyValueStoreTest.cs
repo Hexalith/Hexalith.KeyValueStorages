@@ -199,7 +199,7 @@ public class InMemoryKeyValueStoreTest
         _ = await Should.ThrowAsync<ConcurrencyException<long>>(
             async () => await store.SetAsync(
                 1,
-                new State<long>(200, null, "bad etag"),
+                new State<long>(200, "bad etag", null),
                 CancellationToken.None));
     }
 
@@ -233,7 +233,7 @@ public class InMemoryKeyValueStoreTest
         string etag = await store.AddAsync(1, new State<long>(100L, null, null), CancellationToken.None);
 
         // Act
-        string newEtag = await store.SetAsync(1, new State<long>(200, null, etag), CancellationToken.None);
+        string newEtag = await store.SetAsync(1, new State<long>(200, etag, null), CancellationToken.None);
 
         // Assert
         newEtag.ShouldNotBeNullOrWhiteSpace();

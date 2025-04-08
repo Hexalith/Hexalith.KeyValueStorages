@@ -7,7 +7,9 @@
     <PackageTags>hexalith;KeyValueStorages;</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Hexalith.Commons.Configurations" />
     <PackageReference Include="Hexalith.Commons.UniqueIds" />
+    <PackageReference Include="Hexalith.PolymorphicSerializations" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj" />

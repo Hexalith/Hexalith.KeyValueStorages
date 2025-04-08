@@ -7,7 +7,6 @@ namespace Hexalith.KeyValueStorages.Tests;
 
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,16 +14,18 @@ using Hexalith.Commons.UniqueIds;
 using Hexalith.KeyValueStorages.Exceptions;
 using Hexalith.KeyValueStorages.Files;
 
+using Microsoft.Extensions.Options;
+
 using Shouldly;
 
 using Xunit;
 
 /// <summary>
-/// Unit tests for the <see cref="JsonFileKeyValueStorage{TKey, TState}"/> class.
+/// Unit tests for the <see cref="JsonFileKeyValueStore{TKey, TState}"/> class.
 /// </summary>
 public partial class JsonFileKeyValueStorageTest : IDisposable
 {
-    private readonly JsonFileKeyValueStorage<string, State<DummyValue>> _storage;
+    private readonly JsonFileKeyValueStore<string, State<DummyValue>> _storage;
     private readonly string _testDirectory;
     private readonly FakeTimeProvider _timeProvider;
     private bool _disposed;
@@ -37,12 +38,11 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         _testDirectory = Path.Combine(Path.GetTempPath(), UniqueIdHelper.GenerateDateTimeId());
         _ = Directory.CreateDirectory(_testDirectory);
         _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        _storage = new JsonFileKeyValueStorage<string, State<DummyValue>>(
-            _testDirectory,
-            "TestDatabase",
+        _storage = new JsonFileKeyValueStore<string, State<DummyValue>>(
+            Options.Create(new FileKeyValueStoreSettings(_testDirectory, "TestDatabase")),
             null,
-            new JsonSerializerOptions { WriteIndented = true },
-            key => key + ".json",
+            null,
+            null,
             _timeProvider);
     }
 
@@ -159,7 +159,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         };
 
         // Create a state with a TTL of 1 minute
-        var state = new State<DummyValue>(dummyValue, TimeSpan.FromMinutes(1), null);
+        var state = new State<DummyValue>(dummyValue, null, TimeSpan.FromMinutes(1));
         _ = await _storage.AddAsync("expiring", state, CancellationToken.None);
 
         // Advance time by 2 minutes to make the value expire
@@ -298,7 +298,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         _ = await Should.ThrowAsync<ConcurrencyException<string>>(
             async () => await _storage.SetAsync(
                 "key1",
-                new State<DummyValue>(dummyValue, null, "bad-etag"),
+                new State<DummyValue>(dummyValue, "bad-etag", null),
                 CancellationToken.None));
     }
 
@@ -350,7 +350,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         };
 
         // Act
-        string newEtag = await _storage.SetAsync("key1", new State<DummyValue>(updatedValue, null, etag), CancellationToken.None);
+        string newEtag = await _storage.SetAsync("key1", new State<DummyValue>(updatedValue, etag, null), CancellationToken.None);
 
         // Assert
         newEtag.ShouldNotBeNullOrWhiteSpace();

@@ -17,4 +17,4 @@ using System.Runtime.Serialization;
 public record CountryState(
     Country Value,
     TimeSpan? TimeToLive = null,
-    string? Etag = null) : State<Country, string>(Value, null, TimeToLive, Etag);
+    string? Etag = null) : State<Country>(Value, Etag, TimeToLive);

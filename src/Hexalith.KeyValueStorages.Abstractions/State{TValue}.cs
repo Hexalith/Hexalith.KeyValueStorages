@@ -12,10 +12,11 @@ using System.Runtime.Serialization;
 /// </summary>
 /// <typeparam name="TValue">The type of the stored value.</typeparam>
 /// <param name="Value">The stored value.</param>
-/// <param name="TimeToLive">The time to live for the value.</param>
 /// <param name="Etag">The etag associated with the value.</param>
+/// <param name="TimeToLive">The time to live for the value.</param>
 [DataContract]
 public record State<TValue>(
     [property: DataMember(Order = 3)] TValue Value,
-    TimeSpan? TimeToLive,
-    string? Etag) : StateBase(TimeToLive, Etag);
+    string? Etag,
+    TimeSpan? TimeToLive)
+    : StateBase(Etag, TimeToLive);

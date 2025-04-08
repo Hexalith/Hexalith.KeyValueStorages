@@ -1,4 +1,4 @@
-﻿// <copyright file="IKeyValueStoreProvider.cs" company="ITANEO">
+﻿// <copyright file="IKeyValueProvider.cs" company="ITANEO">
 // Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -10,7 +10,7 @@ using System;
 /// <summary>
 /// Provides functionality to create key-value store instances.
 /// </summary>
-public interface IKeyValueStoreProvider
+public interface IKeyValueProvider
 {
     /// <summary>
     /// Creates a key-value store for the specified database and container.

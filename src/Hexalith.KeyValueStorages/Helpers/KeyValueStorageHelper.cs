@@ -32,14 +32,14 @@ public static class KeyValueStorageHelper
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         services
-            .AddKeyedTransient<IKeyValueStoreProvider, InMemoryKeyValueStoreProvider>(
+            .AddKeyedTransient<IKeyValueProvider, InMemoryKeyValueProvider>(
                 name,
                 (sp, _) =>
                 {
-                    var store = new InMemoryKeyValueStoreProvider(sp);
+                    var store = new InMemoryKeyValueProvider(sp);
                     return store;
                 })
-            .TryAddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+            .TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
         return services;
     }
 }

@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(database);
         ArgumentNullException.ThrowIfNull(services);
-        keyToActorId ??= DaprActorKeyValueStorage<TKey, TState>.KeyToRfc1123;
+        keyToActorId ??= DaprActorKeyValueStore<TKey, TState>.KeyToRfc1123;
 
         // Register the actor with the Dapr runtime
         return services
@@ -59,7 +59,7 @@ public static class ServiceCollectionExtensions
 
             // Register the key-value storage implementation
             .AddSingleton<IKeyValueStore<TKey, TState>>(
-                sp => new DaprActorKeyValueStorage<TKey, TState>(
+                sp => new DaprActorKeyValueStore<TKey, TState>(
                     database,
                     container,
                     keyToActorId,
