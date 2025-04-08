@@ -29,16 +29,16 @@ public static class JsonKeyValueStorageHelper
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        services
+        services.TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
+        services.TryAddSingleton(TimeProvider.System);
+        return services
             .AddKeyedTransient<IKeyValueProvider, JsonFileKeyValueProvider>(
                 name,
                 (sp, _) =>
                 {
                     var store = new JsonFileKeyValueProvider(sp);
                     return store;
-                })
-            .TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
-        return services;
+                });
     }
 
     /// <summary>
@@ -55,15 +55,15 @@ public static class JsonKeyValueStorageHelper
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        services
+        services.TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
+        services.TryAddSingleton(TimeProvider.System);
+        return services
             .AddKeyedTransient<IKeyValueProvider, PolymorphicJsonKeyValueStoreProvider>(
                 name,
                 (sp, _) =>
                 {
                     var store = new PolymorphicJsonKeyValueStoreProvider(sp);
                     return store;
-                })
-            .TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
-        return services;
+                });
     }
 }

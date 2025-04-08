@@ -31,15 +31,15 @@ public static class KeyValueStorageHelper
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        services
+        services.TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
+        services.TryAddSingleton<TimeProvider>();
+        return services
             .AddKeyedTransient<IKeyValueProvider, InMemoryKeyValueProvider>(
                 name,
                 (sp, _) =>
                 {
                     var store = new InMemoryKeyValueProvider(sp);
                     return store;
-                })
-            .TryAddSingleton<IKeyValueFactory, KeyValueStoreFactory>();
-        return services;
+                });
     }
 }

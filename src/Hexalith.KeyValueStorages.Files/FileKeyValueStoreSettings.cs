@@ -12,22 +12,30 @@ using Hexalith.Commons.Configurations;
 /// <summary>
 /// Represents the settings for a JSON-based key-value store.
 /// </summary>
-/// <param name="StorageRootPath">The root path for storing files.</param>
-/// <param name="Database">The name of the database.</param>
 [DataContract]
-public record FileKeyValueStoreSettings(
-   [property: DataMember(Order = 1)] string? StorageRootPath = FileKeyValueStoreSettings.DefaultStorageRootPath,
-   [property: DataMember(Order = 2)] string? Database = FileKeyValueStoreSettings.DefaultDatabase) : ISettings
+public class FileKeyValueStoreSettings : ISettings
 {
+    /// <summary>
+    /// The default name of the database.
+    /// </summary>
+    public const string DefaultDatabase = "database";
+
     /// <summary>
     /// The default root path for storing files.
     /// </summary>
     public const string DefaultStorageRootPath = "/store";
 
     /// <summary>
-    /// The default name of the database.
+    /// Gets or sets the name of the database.
     /// </summary>
-    public const string DefaultDatabase = "database";
+    [DataMember(Order = 2)]
+    public string? Database { get; set; } = FileKeyValueStoreSettings.DefaultDatabase;
+
+    /// <summary>
+    /// Gets or sets the root path for storing files.
+    /// </summary>
+    [DataMember(Order = 1)]
+    public string? StorageRootPath { get; set; } = FileKeyValueStoreSettings.DefaultStorageRootPath;
 
     /// <summary>
     /// Gets the configuration name for the JSON key-value store settings.
