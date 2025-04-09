@@ -43,7 +43,7 @@ public class JsonFileKeyValueStore<TKey, TState>(
     public JsonFileKeyValueStore()
         : this(
               Options.Create<FileKeyValueStoreSettings>(new()),
-              "database",
+              null,
               null,
               null,
               null)

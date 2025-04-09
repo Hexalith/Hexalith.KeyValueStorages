@@ -3,13 +3,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using Hexalith.Commons.Configurations;
 using Hexalith.KeyValueStorages.Files;
 using Hexalith.KeyValueStorages.SimpleApp.Components;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // KeyValueStore configuration
-builder.Services.AddJsonFileKeyValueStore("sample");
+builder.Services.AddJsonFileKeyValueStore("sample"); // Add json file storage for key-value pairs
+builder.Services.ConfigureSettings<FileKeyValueStoreSettings>(builder.Configuration); // Add configuration settings for the key-value store
 
 // Add services to the container.
 builder.Services

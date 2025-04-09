@@ -1,0 +1,110 @@
+﻿@page "/"
+@page "/countries"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Hexalith.KeyValueStorages
+@using Hexalith.KeyValueStorages.SimpleApp
+
+<PageTitle>Countries</PageTitle>
+<SectionContent SectionName="title-bar">
+    <h2>Countries</h2>
+</SectionContent>
+<p>An example using key value provider injection.</p>
+
+@if (countries.Count == 0)
+{
+    <p>No countries available.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Currency</th>
+                <th>Phone Prefix</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var country in countries.Select(p => p.Value))
+            {
+                <tr>
+                    <td>@country.Code</td>
+                    <td>@country.Name</td>
+                    <td>@country.Currency</td>
+                    <td>@country.PhonePrefix</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => EditCountry(country.Code)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="async () => await DeleteCountry(country.Code)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<button class="btn btn-primary btn-sm" @onclick="AddCountry">Add</button>
+
+@code
+{
+    [Inject(Key = "sample")]
+    required public IKeyValueProvider DataProvider { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private IKeyValueStore<string, CountryState>? _countriesStore;
+    private IKeyValueStore<string, CountryState> CountriesStore
+        => _countriesStore ??= DataProvider.Create<string, CountryState>();
+
+    private IKeyValueStore<string, CountryIndexState>? _countryIdsStore;
+    private IKeyValueStore<string, CountryIndexState> CountryIdsStore
+        => _countryIdsStore ??= DataProvider.Create<string, CountryIndexState>();
+
+    private List<CountryState> countries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        IEnumerable<string>? ids = (await CountryIdsStore.TryGetAsync("All", CancellationToken.None))?.Value;
+        if (ids is null)
+        {
+            // Initialize the index if it doesn't exist
+            await CountryIdsStore.AddAsync("All", new CountryIndexState(new List<string>()), CancellationToken.None);
+            countries = new List<CountryState>();
+            return;
+        }
+
+        var countryIds = ids ?? [];
+        var countryTasks = new List<Task<CountryState>>();
+        foreach (var id in countryIds)
+        {
+            countryTasks.Add(CountriesStore.GetAsync(id, CancellationToken.None));
+        }
+        countries = (await Task.WhenAll(countryTasks)).ToList();
+    }
+    private void EditCountry(string code)
+    {
+        NavigationManager.NavigateTo($"/countries/edit/{code}");
+    }
+    private void AddCountry()
+    {
+        NavigationManager.NavigateTo($"/countries/add");
+    }
+    private async Task DeleteCountry(string code)
+    {
+        var country = countries.First(p => p.Value.Code == code);
+        await CountriesStore.RemoveAsync(country.Value.Code, country.Etag, CancellationToken.None);
+        var ids = await CountryIdsStore.GetAsync("All", CancellationToken.None);
+        await CountryIdsStore.SetAsync(
+            "All",
+            new CountryIndexState(ids.Value.Where(p => p != country.Value.Code).ToList()),
+            CancellationToken.None);
+        countries.Remove(country);
+        StateHasChanged();
+    }
+
+  
+}
+

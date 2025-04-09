@@ -1,0 +1,112 @@
+﻿@page "/countries/add"
+@page "/countries/edit/{CountryId}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Hexalith.KeyValueStorages
+@using Hexalith.KeyValueStorages.SimpleApp
+
+<PageTitle>Countries</PageTitle>
+<SectionContent SectionName="title-bar">
+    <h2>@(string.IsNullOrWhiteSpace(CountryId) ? "Add country" : $"Edit country {CountryId}")</h2>
+</SectionContent>
+
+
+<div class="mb-4">
+    <EditForm Model="newCountry" OnValidSubmit="async () => await HandleValidSubmit()" FormName="countryForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="code" class="form-label">Code</label>
+            <InputText id="code" @bind-Value="newCountry.Code" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" @bind-Value="newCountry.Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="currency" class="form-label">Currency</label>
+            <InputText id="currency" @bind-Value="newCountry.Currency" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="phonePrefix" class="form-label">Phone Prefix</label>
+            <InputNumber id="phonePrefix" @bind-Value="newCountry.PhonePrefix" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">@(string.IsNullOrWhiteSpace(CountryId) ? "Add Country" : "Update Country")</button>
+    </EditForm>
+</div>
+
+
+@code
+{
+    [Parameter]
+    public string? CountryId { get; set; }
+
+    [Inject(Key = "sample")]
+    required public IKeyValueProvider DataProvider { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private IKeyValueStore<string, CountryState>? _countriesStore;
+    private IKeyValueStore<string, CountryState> CountriesStore
+        => _countriesStore ??= DataProvider.Create<string, CountryState>("testdb", "country");
+
+    private IKeyValueStore<string, CountryIndexState>? _countryIdsStore;
+    private IKeyValueStore<string, CountryIndexState> CountryIdsStore
+        => _countryIdsStore ??= DataProvider.Create<string, CountryIndexState>("testdb", "country-index");
+
+    private CountryViewModel newCountry = new();
+
+    private CountryState? currentCountry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(CountryId))
+        {
+            // Initialize the index if it doesn't exist
+            currentCountry = await CountriesStore.GetAsync(CountryId, CancellationToken.None);
+            newCountry = new (currentCountry);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(CountryId))
+        {
+            // Add new country
+            var ids = await CountryIdsStore.GetAsync("All", CancellationToken.None);
+            if (ids is null)
+            {
+                // Initialize the index if it doesn't exist
+                await CountryIdsStore.AddAsync("All", new CountryIndexState([newCountry.Code]), CancellationToken.None);
+            }
+            else
+            {
+                if (ids.Value.Contains(newCountry.Code))
+                    return;
+                await CountryIdsStore.SetAsync(
+                    "All",
+                    new CountryIndexState(ids.Value.Append(newCountry.Code).ToList()),
+                    CancellationToken.None);
+            }
+            await CountriesStore.AddAsync(newCountry.Code, newCountry.CountryState, CancellationToken.None);
+        }
+        else
+        {
+            if (currentCountry is null)
+                return;
+            var etag = await CountriesStore.SetAsync(
+                newCountry.Code, 
+                newCountry.CountryState, 
+                CancellationToken.None);
+            currentCountry = currentCountry with { Etag = etag };
+        }
+        NavigationManager.NavigateTo("/countries");
+    }
+}
+

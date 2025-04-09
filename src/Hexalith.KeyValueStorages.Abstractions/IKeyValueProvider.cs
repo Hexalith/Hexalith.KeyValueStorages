@@ -20,7 +20,7 @@ public interface IKeyValueProvider
     /// <param name="database">The name of the database.</param>
     /// <param name="container">The name of the container.</param>
     /// <returns>An instance of <see cref="IKeyValueStore{TKey, TState}"/>.</returns>
-    IKeyValueStore<TKey, TState> Create<TKey, TState>(string database, string container)
+    IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase;
 }

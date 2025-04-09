@@ -32,11 +32,10 @@ public class JsonFileKeyValueProvider : IKeyValueProvider
     }
 
     /// <inheritdoc/>
-    public IKeyValueStore<TKey, TState> Create<TKey, TState>(string database, string? container)
+    public IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(database);
         JsonSerializerOptions? options = _serviceProvider.GetService<JsonSerializerOptions>();
         var store = new JsonFileKeyValueStore<TKey, TState>(
             _serviceProvider.GetRequiredService<IOptions<FileKeyValueStoreSettings>>(),
