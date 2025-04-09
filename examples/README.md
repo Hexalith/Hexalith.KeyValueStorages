@@ -26,3 +26,27 @@ dotnet run
 ```
 
 For more detailed information, see the [example's README.md](./Hexalith.KeyValueStorages.JsonExample/README.md).
+
+### [Hexalith.KeyValueStorages.SimpleApp](./Hexalith.KeyValueStorages.SimpleApp/README.md)
+
+This example shows a complete Blazor Server application that demonstrates how to use the Hexalith.KeyValueStorages library for managing country data.
+
+**Key Features:**
+- Full Blazor Server UI with interactive rendering for CRUD operations
+- JSON file-based persistence using the key-value storage system
+- Index management for retrieving lists of records
+- Optimistic concurrency control with ETags
+
+**Main Components:**
+- `Country` record - A data model with country code, name, currency, and phone prefix
+- `CountryState` record - A wrapper for concurrency control
+- `CountryIndexState` - Manages the list of all country codes
+- Blazor components for displaying and editing country data
+
+**Running the Example:**
+```bash
+cd Hexalith.KeyValueStorages.SimpleApp
+dotnet run
+```
+
+For more detailed information, see the [example's README.md](./Hexalith.KeyValueStorages.SimpleApp/README.md).
