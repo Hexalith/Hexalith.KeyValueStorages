@@ -54,11 +54,11 @@
 
     private IKeyValueStore<string, CountryState>? _countriesStore;
     private IKeyValueStore<string, CountryState> CountriesStore
-        => _countriesStore ??= DataProvider.Create<string, CountryState>("testdb", "country");
+        => _countriesStore ??= DataProvider.Create<string, CountryState>();
 
     private IKeyValueStore<string, CountryIndexState>? _countryIdsStore;
     private IKeyValueStore<string, CountryIndexState> CountryIdsStore
-        => _countryIdsStore ??= DataProvider.Create<string, CountryIndexState>("testdb", "country-index");
+        => _countryIdsStore ??= DataProvider.Create<string, CountryIndexState>();
 
     private CountryViewModel newCountry = new();
 
