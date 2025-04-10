@@ -10,8 +10,8 @@ using System.Runtime.Serialization;
 /// <summary>
 /// Represents a stored value with its etag.
 /// </summary>
-/// <param name="TimeToLive">The time to live for the value.</param>
 /// <param name="Etag">The etag associated with the value.</param>
+/// <param name="TimeToLive">The time to live for the value.</param>
 [DataContract]
 public record StateBase(
     [property: DataMember(Order = 2)] string? Etag,

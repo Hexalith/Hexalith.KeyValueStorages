@@ -6,7 +6,6 @@ namespace Hexalith.KeyValueStorages.InMemory;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,25 +13,60 @@ using Hexalith.Commons.UniqueIds;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Exceptions;
 
+using Microsoft.Extensions.Options;
+
 /// <summary>
 /// An in-memory implementation of the IKeyValueStore interface.
 /// </summary>
 /// <typeparam name="TKey">The type of the key, must be non-null.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
-/// <param name="database">The name of the database.</param>
-/// <param name="container">The name of the container.</param>
+/// <param name="settings">The settings for the key-value store.</param>
+/// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+/// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+/// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
 /// <param name="timeProvider">The time provider to use for managing expiration times.</param>"
 public class InMemoryKeyValueStore<TKey, TState>(
-    [NotNull] string database = "database",
+    IOptions<KeyValueStoreSettings> settings,
+    string? database,
     string? container = null,
+    string? entity = null,
     TimeProvider? timeProvider = null)
-        : KeyValueStore<TKey, TState>(database, container, timeProvider ?? TimeProvider.System)
+        : KeyValueStore<TKey, TState>(settings, database, container, entity, timeProvider ?? TimeProvider.System)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase
 {
     private static readonly Lock _lock = new();
     private static readonly Dictionary<InMemoryKey<TKey>, TState> _store = [];
     private static readonly Dictionary<InMemoryKey<TKey>, DateTimeOffset> _timeToLive = [];
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
+    /// </summary>
+    public InMemoryKeyValueStore()
+        : this(
+        Options.Create<KeyValueStoreSettings>(new KeyValueStoreSettings()),
+        null,
+        null,
+        null,
+        null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryKeyValueStore{TKey, TState}"/> class.
+    /// </summary>
+    /// <param name="database">The name of the database.</param>
+    /// <param name="container">The name of the container.</param>
+    /// <param name="timeProvider">The time provider to use for managing expiration times. If not provided, the system time provider is used.</param>
+    public InMemoryKeyValueStore(string database, string container, TimeProvider? timeProvider)
+        : this(
+        Options.Create<KeyValueStoreSettings>(new KeyValueStoreSettings()),
+        database,
+        container,
+        null,
+        timeProvider)
+    {
+    }
 
     /// <inheritdoc/>
     public override Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)

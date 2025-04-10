@@ -15,6 +15,8 @@ using Hexalith.Commons.StringEncoders;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.DaprComponents.Actors;
 
+using Microsoft.Extensions.Options;
+
 /// <summary>
 /// Dapr actor-based key-value storage implementation.
 /// </summary>
@@ -30,12 +32,20 @@ public class DaprActorKeyValueStore<TKey, TState>
     /// <summary>
     /// Initializes a new instance of the <see cref="DaprActorKeyValueStore{TKey, TState}"/> class.
     /// </summary>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
+    /// <param name="settings">The settings for the key-value store.</param>
+    /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+    /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+    /// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
     /// <param name="keyToActorId">The function to convert the key to an actor ID.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    public DaprActorKeyValueStore(string database, string? container, Func<TKey, string> keyToActorId, TimeProvider? timeProvider = null)
-        : base(database, container, timeProvider)
+    public DaprActorKeyValueStore(
+        IOptions<KeyValueStoreSettings> settings,
+        string? database,
+        string? container,
+        string? entity,
+        Func<TKey, string> keyToActorId,
+        TimeProvider? timeProvider = null)
+        : base(settings, database, container, entity, timeProvider)
     {
         ArgumentNullException.ThrowIfNull(keyToActorId);
         _keyToActorId = keyToActorId;
@@ -44,11 +54,18 @@ public class DaprActorKeyValueStore<TKey, TState>
     /// <summary>
     /// Initializes a new instance of the <see cref="DaprActorKeyValueStore{TKey, TState}"/> class.
     /// </summary>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
+    /// <param name="settings">The settings for the key-value store.</param>
+    /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+    /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+    /// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    public DaprActorKeyValueStore(string database, string? container, TimeProvider? timeProvider)
-        : this(database, container, KeyToRfc1123, timeProvider)
+    public DaprActorKeyValueStore(
+        IOptions<KeyValueStoreSettings> settings,
+        string? database,
+        string? container,
+        string? entity,
+        TimeProvider? timeProvider = null)
+        : this(settings, database, container, entity, KeyToRfc1123, timeProvider)
     {
     }
 

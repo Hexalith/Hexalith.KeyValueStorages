@@ -6,62 +6,40 @@
 namespace Hexalith.KeyValueStorages;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Hexalith.KeyValueStorages.Helpers;
+
+using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Represents an abstract key-value store.
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TState">The type of the state.</typeparam>
-public abstract class KeyValueStore<TKey, TState> : IKeyValueStore<TKey, TState>
+/// <remarks>
+/// Initializes a new instance of the <see cref="KeyValueStore{TKey, TState}"/> class.
+/// </remarks>
+/// <param name="settings">The settings for the key-value store.</param>
+/// <param name="database">The name of the database.</param>
+/// <param name="container">The name of the container.</param>
+/// <param name="entity">The name of the entity.</param>
+/// <param name="timeProvider">The time provider to use for managing expiration times.</param>
+public abstract class KeyValueStore<TKey, TState>(
+    IOptions<KeyValueStoreSettings> settings,
+    string? database,
+    string? container,
+    string? entity,
+    TimeProvider? timeProvider) : KeyValueStore(
+        settings,
+        database,
+        container,
+        GetEntity(entity),
+        timeProvider), IKeyValueStore<TKey, TState>
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeyValueStore{TKey, TState}"/> class.
-    /// </summary>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
-    /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
-    protected KeyValueStore([NotNull] string database, string? container, TimeProvider? timeProvider)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(database);
-
-        // If container is null or empty, use DataContract attribute name or type name
-        if (string.IsNullOrWhiteSpace(container))
-        {
-            Container = typeof(TState)
-                .GetCustomAttributes(typeof(DataContractAttribute), true)
-                .OfType<DataContractAttribute>()
-                .FirstOrDefault()?.Name ?? typeof(TState).Name;
-        }
-        else
-        {
-            Container = container;
-        }
-
-        TimeProvider = timeProvider ?? TimeProvider.System;
-        Database = database;
-    }
-
-    /// <summary>
-    /// Gets the container name.
-    /// </summary>
-    public string Container { get; }
-
-    /// <summary>
-    /// Gets the database name.
-    /// </summary>
-    public string Database { get; }
-
-    /// <summary>
-    /// Gets the time provider, using the service provider if not already set.
-    /// </summary>
-    protected TimeProvider TimeProvider { get; }
-
     /// <inheritdoc/>
     public abstract Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken);
 
@@ -79,4 +57,14 @@ public abstract class KeyValueStore<TKey, TState> : IKeyValueStore<TKey, TState>
 
     /// <inheritdoc/>
     public abstract Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken);
+
+    private static string GetEntity(string? entity)
+    {
+        if (string.IsNullOrWhiteSpace(entity))
+        {
+            return StateHelper.GetStateName<TState>();
+        }
+
+        return entity;
+    }
 }

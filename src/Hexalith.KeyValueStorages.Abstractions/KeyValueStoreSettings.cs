@@ -1,9 +1,9 @@
-﻿// <copyright file="FileKeyValueStoreSettings.cs" company="ITANEO">
+﻿// <copyright file="KeyValueStoreSettings.cs" company="ITANEO">
 // Copyright (c) ITANEO (https://www.itaneo.com). All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Hexalith.KeyValueStorages.Files;
+namespace Hexalith.KeyValueStorages;
 
 using System.Runtime.Serialization;
 
@@ -13,29 +13,31 @@ using Hexalith.Commons.Configurations;
 /// Represents the settings for a JSON-based key-value store.
 /// </summary>
 [DataContract]
-public class FileKeyValueStoreSettings : ISettings
+public class KeyValueStoreSettings : ISettings
 {
-    /// <summary>
-    /// The default name of the database.
-    /// </summary>
-    public const string DefaultDatabase = "database";
+    private const string _defaultContainerName = "container";
+
+    private const string _defaultDatabaseName = "database";
+
+    private const string _defaultStorageRootPath = "/store";
 
     /// <summary>
-    /// The default root path for storing files.
+    /// Gets or sets the default container name.
     /// </summary>
-    public const string DefaultStorageRootPath = "/store";
+    [DataMember(Order = 3)]
+    public string? DefaultContainer { get; set; } = _defaultContainerName;
 
     /// <summary>
     /// Gets or sets the name of the database.
     /// </summary>
     [DataMember(Order = 2)]
-    public string? Database { get; set; } = FileKeyValueStoreSettings.DefaultDatabase;
+    public string? DefaultDatabase { get; set; } = _defaultDatabaseName;
 
     /// <summary>
     /// Gets or sets the root path for storing files.
     /// </summary>
     [DataMember(Order = 1)]
-    public string? StorageRootPath { get; set; } = FileKeyValueStoreSettings.DefaultStorageRootPath;
+    public string? StorageRootPath { get; set; } = _defaultStorageRootPath;
 
     /// <summary>
     /// Gets the configuration name for the JSON key-value store settings.

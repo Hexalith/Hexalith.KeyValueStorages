@@ -19,34 +19,38 @@ using Microsoft.Extensions.Options;
 /// Initializes a new instance of the <see cref="JsonFileKeyValueStore{TKey, TValue}"/> class.
 /// </remarks>
 /// <param name="settings">The settings for the file key-value store.</param>
-/// <param name="database">The name of the database.</param>
-/// <param name="container">The name of the container.</param>
+/// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+/// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+/// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
 /// <param name="options">The JSON serializer options.</param>
 /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
 public class JsonFileKeyValueStore<TKey, TState>(
-    IOptions<FileKeyValueStoreSettings> settings,
+    IOptions<KeyValueStoreSettings> settings,
     string? database = null,
     string? container = null,
+    string? entity = null,
     JsonSerializerOptions? options = null,
     TimeProvider? timeProvider = null) :
     FileKeyValueStorage<TKey, TState>(
         settings,
         database,
         container,
+        entity,
         timeProvider)
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="JsonFileKeyValueStore{TKey, TValue}"/> class.
+    /// Initializes a new instance of the <see cref="JsonFileKeyValueStore{TKey, TState}"/> class.
     /// </summary>
     public JsonFileKeyValueStore()
         : this(
-              Options.Create<FileKeyValueStoreSettings>(new()),
-              null,
-              null,
-              null,
-              null)
+            Options.Create(new KeyValueStoreSettings()),
+            null,
+            null,
+            null,
+            null,
+            null)
     {
     }
 

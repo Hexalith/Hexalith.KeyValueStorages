@@ -4,6 +4,7 @@
 // </copyright>
 
 using Hexalith.Commons.Configurations;
+using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Files;
 using Hexalith.KeyValueStorages.SimpleApp.Components;
 
@@ -11,7 +12,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // KeyValueStore configuration
 builder.Services.AddJsonFileKeyValueStore("sample"); // Add json file storage for key-value pairs
-builder.Services.ConfigureSettings<FileKeyValueStoreSettings>(builder.Configuration); // Add configuration settings for the key-value store
+builder.Services.ConfigureSettings<KeyValueStoreSettings>(builder.Configuration); // Add configuration settings for the key-value store
 
 // Add services to the container.
 builder.Services

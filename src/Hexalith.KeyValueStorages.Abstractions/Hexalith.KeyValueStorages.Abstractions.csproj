@@ -7,4 +7,7 @@
     <PackageTags>hexalith;KeyValueStorages;</PackageTags>
     <RootNamespace>Hexalith.KeyValueStorages</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Hexalith.Commons.Configurations" />
+  </ItemGroup>
 </Project>

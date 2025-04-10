@@ -39,7 +39,13 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
         _ = Directory.CreateDirectory(_testDirectory);
         _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
         _storage = new JsonFileKeyValueStore<string, State<DummyValue>>(
-            Options.Create(new FileKeyValueStoreSettings { StorageRootPath = _testDirectory, Database = "TestDatabase" }),
+            Options.Create(new KeyValueStoreSettings
+            {
+                StorageRootPath = _testDirectory,
+                DefaultDatabase = "TestDatabase",
+                DefaultContainer = "DummyValues",
+            }),
+            null,
             null,
             null,
             null,

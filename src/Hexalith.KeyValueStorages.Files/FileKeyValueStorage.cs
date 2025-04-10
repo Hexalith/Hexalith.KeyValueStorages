@@ -14,6 +14,7 @@ using Hexalith.Commons.Configurations;
 using Hexalith.Commons.UniqueIds;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Exceptions;
+using Hexalith.KeyValueStorages.Helpers;
 
 using Microsoft.Extensions.Options;
 
@@ -33,17 +34,19 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// Initializes a new instance of the <see cref="FileKeyValueStorage{TKey, TState}"/> class.
     /// </summary>
     /// <param name="settings">The settings for the file key-value store.</param>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
+    /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+    /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+    /// <param name="entity">The name of the entity.</param>
     /// <param name="timeProvider">The time provider to use for managing expiration times.</param>
     protected FileKeyValueStorage(
-        IOptions<FileKeyValueStoreSettings> settings,
+        IOptions<KeyValueStoreSettings> settings,
         string? database = null,
         string? container = null,
+        string? entity = null,
         TimeProvider? timeProvider = null)
-        : base(GetDatabase(database, settings), container, timeProvider)
+        : base(settings, database, container, GetEntity(entity), timeProvider)
     {
-        SettingsException<FileKeyValueStoreSettings>.ThrowIfUndefined(settings.Value.StorageRootPath);
+        SettingsException<KeyValueStoreSettings>.ThrowIfUndefined(settings.Value.StorageRootPath);
         _rootPath = settings.Value.StorageRootPath;
     }
 
@@ -89,7 +92,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// Gets the directory path for the storage.
     /// </summary>
     /// <returns>The directory path.</returns>
-    public string GetDirectoryPath() => Path.Combine(_rootPath, Database, Container);
+    public string GetDirectoryPath() => Path.Combine(_rootPath, Database, Container, Entity);
 
     /// <summary>
     /// Gets the file path for the specified key.
@@ -210,15 +213,14 @@ public abstract class FileKeyValueStorage<TKey, TState>
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private static string GetDatabase(string? database, IOptions<FileKeyValueStoreSettings> settings)
+    private static string GetEntity(string? entity)
     {
-        if (string.IsNullOrWhiteSpace(database))
+        if (string.IsNullOrWhiteSpace(entity))
         {
-            SettingsException<FileKeyValueStoreSettings>.ThrowIfUndefined(settings.Value.Database);
-            return settings.Value.Database;
+            return StateHelper.GetStateName<TState>();
         }
 
-        return database;
+        return entity;
     }
 
     private async Task<TState?> ReadAsync(string filePath, CancellationToken cancellationToken)

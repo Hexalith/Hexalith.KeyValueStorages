@@ -19,4 +19,9 @@ public interface IKeyValueStore
     /// Gets the database name.
     /// </summary>
     string Database { get; }
+
+    /// <summary>
+    /// Gets the entity name.
+    /// </summary>
+    string? Entity { get; }
 }

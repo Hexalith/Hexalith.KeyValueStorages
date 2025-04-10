@@ -11,6 +11,7 @@ using Hexalith.KeyValueStorages.DaprComponents.Actors;
 using Hexalith.KeyValueStorages.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/> to register Dapr actor key-value storage.
@@ -37,14 +38,18 @@ public static class ServiceCollectionExtensions
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <param name="services">The service collection.</param>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container. If not provided, a default value is used.</param>
+    /// <param name="name">The name of the service.</param>
+    /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+    /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+    /// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
     /// <param name="keyToActorId">Optional function to convert the key to an actor ID. If not provided, a default conversion is used.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddDaprActorKeyValueStorage<TKey, TState>(
         this IServiceCollection services,
-        string database,
+        string name,
+        string? database = null,
         string? container = null,
+        string? entity = null,
         Func<TKey, string>? keyToActorId = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase
@@ -58,11 +63,13 @@ public static class ServiceCollectionExtensions
             .AddDaprKeyValueStoreActor<TState>(database, container)
 
             // Register the key-value storage implementation
-            .AddSingleton<IKeyValueStore<TKey, TState>>(
-                sp => new DaprActorKeyValueStore<TKey, TState>(
+            .AddKeyedSingleton<IKeyValueProvider>(
+                name,
+                (sp, _) => new DaprActorKeyValueProvider(
+                    sp.GetRequiredService<IOptions<KeyValueStoreSettings>>(),
                     database,
                     container,
-                    keyToActorId,
+                    entity,
                     sp.GetRequiredService<TimeProvider>()));
     }
 

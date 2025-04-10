@@ -17,10 +17,11 @@ public interface IKeyValueProvider
     /// </summary>
     /// <typeparam name="TKey">The type of the key. Must implement <see cref="IEquatable{TKey}"/> and be non-nullable.</typeparam>
     /// <typeparam name="TState">The type of the state. Must inherit from <see cref="StateBase"/>.</typeparam>
-    /// <param name="database">The name of the database.</param>
-    /// <param name="container">The name of the container.</param>
+    /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
+    /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
+    /// <param name="entity">The name of the entity.</param>
     /// <returns>An instance of <see cref="IKeyValueStore{TKey, TState}"/>.</returns>
-    IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null)
+    IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase;
 }

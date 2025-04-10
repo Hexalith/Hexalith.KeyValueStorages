@@ -7,9 +7,9 @@
     <PackageVersion Include="Dapr.Actors" Version="1.15.2" />
     <PackageVersion Include="Dapr.Actors.AspNetCore" Version="1.15.2" />
     <PackageVersion Include="Dapr.Actors.Generators" Version="1.15.2" />
-    <PackageVersion Include="Hexalith.Commons.Configurations" Version="1.66.2" />
+    <PackageVersion Include="Hexalith.Commons.Configurations" Version="1.66.3" />
     <PackageVersion Include="Hexalith.Commons.StringEncoders" Version="1.65.1" />
-    <PackageVersion Include="Hexalith.Commons.UniqueIds" Version="1.66.2" />
+    <PackageVersion Include="Hexalith.Commons.UniqueIds" Version="1.66.3" />
     <PackageVersion Include="Hexalith.PolymorphicSerialization" Version="1.55.0" />
     <PackageVersion Include="Hexalith.PolymorphicSerializations" Version="1.6.2" />
     <PackageVersion Include="PolymorphicPseudonymisation" Version="2.0.0" />
