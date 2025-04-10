@@ -47,6 +47,9 @@ public abstract class KeyValueStore<TKey, TState>(
     public abstract Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken);
 
     /// <inheritdoc/>
+    public abstract Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken);
+
+    /// <inheritdoc/>
     public abstract Task<TState> GetAsync(TKey key, CancellationToken cancellationToken);
 
     /// <inheritdoc/>

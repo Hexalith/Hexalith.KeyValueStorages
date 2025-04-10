@@ -84,6 +84,13 @@ public abstract class FileKeyValueStorage<TKey, TState>
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false) is not null;
 
     /// <inheritdoc/>
+    public override Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken)
+    {
+        string filePath = GetFilePath(key);
+        return Task.FromResult(File.Exists(filePath));
+    }
+
+    /// <inheritdoc/>
     public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
         => await ReadAsync(key, cancellationToken).ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Key not found: {key}");

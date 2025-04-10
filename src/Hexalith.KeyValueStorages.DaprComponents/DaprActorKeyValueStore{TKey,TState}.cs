@@ -98,6 +98,9 @@ public class DaprActorKeyValueStore<TKey, TState>
     public override async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken) => (await GetActor(key).TryGetAsync(cancellationToken).ConfigureAwait(false)) != null;
 
     /// <inheritdoc/>
+    public override Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+    /// <inheritdoc/>
     public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken) => await GetActor(key).GetAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>

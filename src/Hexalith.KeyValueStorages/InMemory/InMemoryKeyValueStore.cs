@@ -125,6 +125,27 @@ public class InMemoryKeyValueStore<TKey, TState>(
         }
     }
 
+    /// <summary>
+    /// Checks if a key exists in the in-memory key-value store.
+    /// </summary>
+    /// <param name="key">The key to check for existence.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains true if the key exists; otherwise, false.</returns>
+    public override Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using (_lock.EnterScope())
+        {
+            InMemoryKey<TKey> storeKey = GetKey(key);
+            if (_store.ContainsKey(storeKey))
+            {
+                return Task.FromResult(true);
+            }
+
+            return Task.FromResult(false);
+        }
+    }
+
     /// <inheritdoc/>
     public override Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
     {

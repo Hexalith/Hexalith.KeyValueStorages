@@ -32,6 +32,14 @@ public interface IKeyValueStore<TKey, TState> : IKeyValueStore
     Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Asynchronously checks if a key exists in the store.
+    /// </summary>
+    /// <param name="key">The key to check for existence.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation. The result is true if the key exists; otherwise, false.</returns>
+    Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Asynchronously gets the value associated with the specified key.
     /// </summary>
     /// <param name="key">The key whose value to get.</param>
