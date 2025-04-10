@@ -41,6 +41,21 @@ public class JsonFileKeyValueProvider(
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonFileKeyValueProvider"/> class with the specified JSON serializer options.
+    /// </summary>
+    /// <param name="options">The JSON serializer options to use for the key-value store.</param>
+    public JsonFileKeyValueProvider(JsonSerializerOptions options)
+        : this(
+            Options.Create(new KeyValueStoreSettings()),
+            null,
+            null,
+            null,
+            options,
+            null)
+    {
+    }
+
     /// <inheritdoc/>
     public override IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null)
     {
