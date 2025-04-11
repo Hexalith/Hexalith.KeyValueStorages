@@ -24,6 +24,15 @@ public interface IKeyValueStore<TKey, TState> : IKeyValueStore
     Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Asynchronously adds a new key/value pair or updates the value if the key already exists.
+    /// </summary>
+    /// <param name="key">The key of the element to add or update.</param>
+    /// <param name="value">The value to associate with the key.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>Returns the Etag.</returns>
+    Task<string> AddOrUpdateAsync(TKey key, TState value, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Asynchronously determines whether the store contains an element with the specified key.
     /// </summary>
     /// <param name="key">The key to locate in the store.</param>

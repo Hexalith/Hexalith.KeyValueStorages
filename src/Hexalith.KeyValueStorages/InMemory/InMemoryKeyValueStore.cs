@@ -93,6 +93,22 @@ public class InMemoryKeyValueStore<TKey, TState>(
         }
     }
 
+    /// <inheritdoc/>
+    public override Task<string> AddOrUpdateAsync(TKey key, TState value, CancellationToken cancellationToken)
+    {
+        InMemoryKey<TKey> storeKey = GetKey(key);
+        if (_store.ContainsKey(storeKey))
+        {
+            // The key already exists and has not expired
+            return SetAsync(key, value, cancellationToken);
+        }
+        else
+        {
+            // The key does not exist or has expired
+            return AddAsync(key, value, cancellationToken);
+        }
+    }
+
     /// <summary>
     /// Clears all entries in the in-memory key-value store for the current database and container.
     /// </summary>
