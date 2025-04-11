@@ -17,6 +17,6 @@ using System.Runtime.Serialization;
 [DataContract]
 public record State<TValue>(
     [property: DataMember(Order = 3)] TValue Value,
-    string? Etag,
-    TimeSpan? TimeToLive)
+    string? Etag = null,
+    TimeSpan? TimeToLive = null)
     : StateBase(Etag, TimeToLive);
