@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);IDE0079;RCS1251;S3881;</NoWarn>
   </PropertyGroup>
@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
-    <ProjectReference Include="..\..\src\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
+    <ProjectReference Include="..\..\src\packages\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
+    <ProjectReference Include="..\..\src\packages\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
   </ItemGroup>
 
   <ItemGroup>

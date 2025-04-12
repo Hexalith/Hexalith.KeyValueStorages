@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\packages\Hexalith.KeyValueStorages.DaprComponents\Hexalith.KeyValueStorages.DaprComponents.csproj" />
+    <ProjectReference Include="..\..\packages\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
+    <ProjectReference Include="..\..\packages\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
+  </ItemGroup>
+
+</Project>
