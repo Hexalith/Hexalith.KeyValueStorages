@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Description>Hexalith KeyValueStorages utilities and helpers</Description>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</RepositoryUrl>
+    <PackageTags>hexalith;KeyValueStorages;</PackageTags>
+    <RootNamespace>Hexalith.KeyValueStorages</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Hexalith.Commons.Configurations" />
+  </ItemGroup>
+</Project>

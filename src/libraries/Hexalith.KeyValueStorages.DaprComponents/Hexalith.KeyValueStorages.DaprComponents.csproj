@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Description>Hexalith KeyValueStorages utilities and helpers</Description>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</RepositoryUrl>
+    <PackageTags>hexalith;KeyValueStorages;</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapr.Actors" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" />
+    <PackageReference Include="Dapr.Actors.Generators" />
+    <PackageReference Include="Hexalith.Commons.StringEncoders" />
+    <PackageReference Include="Hexalith.Commons.UniqueIds" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj" />
+    <ProjectReference Include="..\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
+  </ItemGroup>
+</Project>
