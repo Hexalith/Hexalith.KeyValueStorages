@@ -86,6 +86,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "publish-packages", "publish
 		Hexalith.Builds\Github\publish-packages\README.md = Hexalith.Builds\Github\publish-packages\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{809F86A1-1C4C-B159-0CD4-DF9D33D876CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hexalith.Builds", "Hexalith.Builds", "{3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}"
+	ProjectSection(SolutionItems) = preProject
+		Hexalith.Builds\.clinerules = Hexalith.Builds\.clinerules
+		Hexalith.Builds\.cursorrules = Hexalith.Builds\.cursorrules
+		Hexalith.Builds\.gitignore = Hexalith.Builds\.gitignore
+		Hexalith.Builds\ai-assistant-instructions.md = Hexalith.Builds\ai-assistant-instructions.md
+		Hexalith.Builds\ai-commit-prompt.md = Hexalith.Builds\ai-commit-prompt.md
+		Hexalith.Builds\Hexalith.Build.props = Hexalith.Builds\Hexalith.Build.props
+		Hexalith.Builds\Hexalith.globalconfig = Hexalith.Builds\Hexalith.globalconfig
+		Hexalith.Builds\Hexalith.Package.props = Hexalith.Builds\Hexalith.Package.props
+		Hexalith.Builds\icon.png = Hexalith.Builds\icon.png
+		Hexalith.Builds\LICENSE = Hexalith.Builds\LICENSE
+		Hexalith.Builds\package.json = Hexalith.Builds\package.json
+		Hexalith.Builds\README.md = Hexalith.Builds\README.md
+		Hexalith.Builds\stylecop.json = Hexalith.Builds\stylecop.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Props", "Props", "{ACEC11B2-9E81-FF47-585D-69158486AF11}"
+	ProjectSection(SolutionItems) = preProject
+		Hexalith.Builds\Props\Directory.Packages.props = Hexalith.Builds\Props\Directory.Packages.props
+		Hexalith.Builds\Props\Environment.Build.props = Hexalith.Builds\Props\Environment.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +166,8 @@ Global
 		{2F050AE5-92C2-4683-9470-9FE6AE592D76} = {EAFFAC48-00E0-46B3-BAD8-8BB859194988}
 		{348B0ECC-4BE8-470B-9779-978FD5D1F1B6} = {EAFFAC48-00E0-46B3-BAD8-8BB859194988}
 		{1AC3106A-A110-41AF-B850-82B34839B43A} = {EAFFAC48-00E0-46B3-BAD8-8BB859194988}
+		{3B64DD0C-1F7E-FF74-B7CF-E67EB8113937} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
+		{ACEC11B2-9E81-FF47-585D-69158486AF11} = {3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B7376F4-B33A-4BC6-AFCA-C09B437568D7}
