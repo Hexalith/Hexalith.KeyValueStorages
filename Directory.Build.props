@@ -1,19 +1,27 @@
 <Project>
+  <!-- Module root build properties. -->
   <PropertyGroup>
-    <!-- Define a property to store the path of the parent Directory.Build.props. -->
+    <!-- Define path of the parent Directory.Build.props. -->
     <ParentDirectoryBuildProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))</ParentDirectoryBuildProps>
-    <!-- Define a property to store the path of the Directory.Build.props in Hexalith.Builds project. This directory can be in the current project or a parent project. -->
-    <HexalithBuildProps>$([MSBuild]::GetDirectoryNameOfFileAbove('Hexalith.Builds', 'Hexalith.Build.props'))</HexalithBuildProps>
+    <!-- Define paths of the Hexalith build props. -->
+    <Hexalith1BuildBuildProps>$(MSBuildThisFileDirectory)Hexalith.Builds/Hexalith.Build.props</Hexalith1BuildBuildProps>
+    <Hexalith2BuildBuildProps>$(MSBuildThisFileDirectory)../Hexalith.Builds/Hexalith.Build.props</Hexalith2BuildBuildProps>
+    <Hexalith3BuildBuildProps>$(MSBuildThisFileDirectory)../../Hexalith.Builds/Hexalith.Build.props</Hexalith3BuildBuildProps>
   </PropertyGroup>
 
   <!-- Import the parent Directory.Build.props file if it exists -->
   <Import Project="$(ParentDirectoryBuildProps)" Condition="Exists('$(ParentDirectoryBuildProps)')" />
 
-  <!-- Import the Hexalith.Build.props file in Hexalith.Builds. This file must exist. -->
-  <Import Project="$(HexalithBuildProps)/Hexalith.Build.props" />
+  <!-- Import the required Hexalith.Build.props file. -->
+  <Import Project="$(Hexalith1BuildBuildProps)" Condition="Exists('$(Hexalith1BuildBuildProps)') And '$(HexalithBuildLoaded)' != 'true'" />
+  <Import Project="$(Hexalith2BuildBuildProps)" Condition="Exists('$(Hexalith2BuildBuildProps)') And '$(HexalithBuildLoaded)' != 'true'" />
+  <Import Project="$(Hexalith3BuildBuildProps)" Condition="'$(HexalithBuildLoaded)' != 'true'" />
 
   <PropertyGroup>
     <Product>Hexalith.PolymorphicSerializations</Product>
     <RepositoryUrl>https://github.com/Hexalith/Hexalith.PolymorphicSerializations</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.PolymorphicSerializations</PackageProjectUrl>
+    <PackageTags>hexalith;polymorphic serialization;</PackageTags>
+    <Description>Hexalith Polymorphic Serializations module</Description>
   </PropertyGroup>
 </Project>

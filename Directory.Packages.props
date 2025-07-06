@@ -1,21 +1,21 @@
 ﻿<Project>
+  <!-- Module packages versions. -->
   <PropertyGroup>
-    <!-- Define a property to store the path of the Directory.Packages.props in Hexalith.Builds project. This directory can be in the current project or a parent project. -->
-    <HexalithPackagesProps>$([MSBuild]::GetDirectoryNameOfFileAbove('Hexalith.Builds', 'Props/Directory.Packages.props'))</HexalithPackagesProps>
+    <!-- Define path of the parent Directory.Packages.props. -->
+    <ParentDirectoryPackageProps>$([MSBuild]::GetPathOfFileAbove('Directory.Packages.props', '$(MSBuildThisFileDirectory)../'))</ParentDirectoryPackageProps>
+    <!-- Define paths of the Hexalith packages props. -->
+    <Hexalith1BuildPackageProps>$(MSBuildThisFileDirectory)Hexalith.Builds/Props/Directory.Packages.props</Hexalith1BuildPackageProps>
+    <Hexalith2BuildPackageProps>$(MSBuildThisFileDirectory)../Hexalith.Builds/Props/Directory.Packages.props</Hexalith2BuildPackageProps>
+    <Hexalith3BuildPackageProps>$(MSBuildThisFileDirectory)../../Hexalith.Builds/Props/Directory.Packages.props</Hexalith3BuildPackageProps>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Dapr.Actors" Version="1.15.3" />
-    <PackageVersion Include="Dapr.Actors.AspNetCore" Version="1.15.3" />
-    <PackageVersion Include="Dapr.Actors.Generators" Version="1.15.3" />
-    <PackageVersion Include="Hexalith.Commons.Configurations" Version="2.0.5" />
-    <PackageVersion Include="Hexalith.Commons.StringEncoders" Version="2.0.5" />
-    <PackageVersion Include="Hexalith.Commons.UniqueIds" Version="2.0.5" />
-    <PackageVersion Include="Hexalith.PolymorphicSerialization" Version="1.55.0" />
-    <PackageVersion Include="Hexalith.PolymorphicSerializations" Version="1.6.2" />
-    <PackageVersion Include="PolymorphicPseudonymisation" Version="2.0.0" />
-  </ItemGroup>
-  <!-- Import the parent Directory.Packages.props file if it exists -->
-  <Import Project="$(ParentDirectoryPackages)" Condition="Exists('$(ParentDirectoryPackages)')" />
+  <Import Project="$(ParentDirectoryPackageProps)" Condition="Exists('$(ParentDirectoryPackageProps)')" />
   <!-- Import the Directory.Package.props file in Hexalith.Builds. -->
-  <Import Project="$(HexalithPackagesProps)/Props/Directory.Packages.props" />
+  <Import Project="$(Hexalith1BuildPackageProps)" Condition="Exists('$(Hexalith1BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
+  <!-- Import the required Hexalith.Packages.props file. -->
+  <Import Project="$(Hexalith2BuildPackageProps)" Condition="Exists('$(Hexalith2BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
+  <Import Project="$(Hexalith3BuildPackageProps)" Condition="'$(HexalithVersionsLoaded)' != 'true'" />
+  <ItemGroup Condition="'$(HexalithVersionsLoaded)' != 'true'">
+    <!-- Define packages versions for this module. -->
+    <!--<PackageVersion Include="PolymorphicPseudonymisation" Version="2.0.0" />-->
+  </ItemGroup>
 </Project>
