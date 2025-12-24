@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.35906.104
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -54,13 +54,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{7E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{2346D241-A9CB-4C17-A290-4617F2161376}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages", "src\packages\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj", "{B5068DDD-806E-6AA3-7BC6-9ECEEF9653E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages", "src\libraries\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj", "{B5068DDD-806E-6AA3-7BC6-9ECEEF9653E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.DaprComponents", "src\packages\Hexalith.KeyValueStorages.DaprComponents\Hexalith.KeyValueStorages.DaprComponents.csproj", "{42083646-84F2-5900-550F-9C7CD4AA6D6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.DaprComponents", "src\libraries\Hexalith.KeyValueStorages.DaprComponents\Hexalith.KeyValueStorages.DaprComponents.csproj", "{42083646-84F2-5900-550F-9C7CD4AA6D6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Abstractions", "src\packages\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj", "{ED6F014F-E6B0-2E23-BB97-30B44F0519C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Abstractions", "src\libraries\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj", "{ED6F014F-E6B0-2E23-BB97-30B44F0519C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Files", "src\packages\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj", "{8936A432-2C7C-7D6F-CE9D-4376B05DB831}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Files", "src\libraries\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj", "{8936A432-2C7C-7D6F-CE9D-4376B05DB831}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.JsonExample", "src\examples\Hexalith.KeyValueStorages.JsonExample\Hexalith.KeyValueStorages.JsonExample.csproj", "{4F78D044-435A-C7C2-7F8D-3EB0781E5D04}"
 EndProject
