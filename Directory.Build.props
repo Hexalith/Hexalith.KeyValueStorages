@@ -18,10 +18,10 @@
   <Import Project="$(Hexalith3BuildBuildProps)" Condition="'$(HexalithBuildLoaded)' != 'true'" />
 
   <PropertyGroup>
-    <Product>Hexalith.PolymorphicSerializations</Product>
-    <RepositoryUrl>https://github.com/Hexalith/Hexalith.PolymorphicSerializations</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.PolymorphicSerializations</PackageProjectUrl>
-    <PackageTags>hexalith;polymorphic serialization;</PackageTags>
-    <Description>Hexalith Polymorphic Serializations module</Description>
+    <Product>Hexalith.KeyValueStorages</Product>
+    <RepositoryUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</PackageProjectUrl>
+    <PackageTags>hexalith;key value;storage;</PackageTags>
+    <Description>Hexalith Key Value Storages Module</Description>
   </PropertyGroup>
 </Project>

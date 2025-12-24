@@ -5,6 +5,7 @@
 
 namespace Hexalith.KeyValueStorages;
 
+using System;
 using System.Runtime.Serialization;
 
 /// <summary>
