@@ -105,12 +105,12 @@ public class KeyValueStoreActor<TState>(ActorHost host)
         {
             Etag = UniqueIdHelper.GenerateUniqueStringId(),  // Generate a new Etag
         };
-        if (value.TimeToLive is not null)
+        if (newValue.TimeToLive is not null)
         {
             await StateManager.SetStateAsync(
                 _stateName,
-                value,
-                value.TimeToLive.Value,
+                newValue,
+                newValue.TimeToLive.Value,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -118,7 +118,7 @@ public class KeyValueStoreActor<TState>(ActorHost host)
         {
             await StateManager.SetStateAsync(
                 _stateName,
-                value,
+                newValue,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
