@@ -21,7 +21,7 @@ public class StateTests
     public void StateBaseConstructorShouldAcceptNullValues()
     {
         // Act
-        var state = new TestState(null, null);
+        TestState state = new(null, null);
 
         // Assert
         state.Etag.ShouldBeNull();
@@ -36,10 +36,10 @@ public class StateTests
     {
         // Arrange
         const string etag = "test-etag";
-        var ttl = TimeSpan.FromMinutes(5);
+        TimeSpan ttl = TimeSpan.FromMinutes(5);
 
         // Act
-        var state = new TestState(etag, ttl);
+        TestState state = new(etag, ttl);
 
         // Assert
         state.Etag.ShouldBe(etag);
@@ -55,10 +55,10 @@ public class StateTests
         // Arrange
         const string value = "test-value";
         const string etag = "test-etag";
-        var ttl = TimeSpan.FromMinutes(5);
+        TimeSpan ttl = TimeSpan.FromMinutes(5);
 
         // Act
-        var state = new State<string>(value, etag, ttl);
+        State<string> state = new(value, etag, ttl);
 
         // Assert
         state.Value.ShouldBe(value);
@@ -76,7 +76,7 @@ public class StateTests
         const string value = "test-value";
 
         // Act
-        var state = new State<string>(value);
+        State<string> state = new(value);
 
         // Assert
         state.Value.ShouldBe(value);
@@ -91,9 +91,9 @@ public class StateTests
     public void StateEqualityShouldCompareAllProperties()
     {
         // Arrange
-        var state1 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
-        var state2 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
-        var state3 = new State<string>("value", "different-etag", TimeSpan.FromMinutes(5));
+        State<string> state1 = new("value", "etag", TimeSpan.FromMinutes(5));
+        State<string> state2 = new("value", "etag", TimeSpan.FromMinutes(5));
+        State<string> state3 = new("value", "different-etag", TimeSpan.FromMinutes(5));
 
         // Assert
         state1.ShouldBe(state2);
@@ -107,7 +107,7 @@ public class StateTests
     public void StateWithComplexObjectValueShouldWork()
     {
         // Arrange
-        var dummy = new DummyValue
+        DummyValue dummy = new()
         {
             Name = "Test",
             Started = DateTimeOffset.UtcNow,
@@ -116,7 +116,7 @@ public class StateTests
         };
 
         // Act
-        var state = new State<DummyValue>(dummy, "etag", TimeSpan.FromHours(1));
+        State<DummyValue> state = new(dummy, "etag", TimeSpan.FromHours(1));
 
         // Assert
         state.Value.Name.ShouldBe("Test");
@@ -132,7 +132,7 @@ public class StateTests
     public void StateWithExpressionShouldCreateModifiedCopy()
     {
         // Arrange
-        var original = new State<string>("value", "old-etag", null);
+        State<string> original = new("value", "old-etag", null);
 
         // Act
         State<string> modified = original with { Etag = "new-etag" };
@@ -150,7 +150,7 @@ public class StateTests
     public void StateWithIntegerValueShouldWork()
     {
         // Act
-        var state = new State<int>(42, "etag", null);
+        State<int> state = new(42, "etag", null);
 
         // Assert
         state.Value.ShouldBe(42);
@@ -164,7 +164,7 @@ public class StateTests
     public void StateWithNullableValueTypeShouldWork()
     {
         // Act
-        var state = new State<int?>(null, "etag", null);
+        State<int?> state = new(null, "etag", null);
 
         // Assert
         state.Value.ShouldBeNull();

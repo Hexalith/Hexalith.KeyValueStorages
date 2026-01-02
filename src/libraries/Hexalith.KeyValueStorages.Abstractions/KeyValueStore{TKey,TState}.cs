@@ -64,13 +64,5 @@ public abstract class KeyValueStore<TKey, TState>(
     /// <inheritdoc/>
     public abstract Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken);
 
-    private static string GetEntity(string? entity)
-    {
-        if (string.IsNullOrWhiteSpace(entity))
-        {
-            return StateHelper.GetStateName<TState>();
-        }
-
-        return entity;
-    }
+    private static string GetEntity(string? entity) => string.IsNullOrWhiteSpace(entity) ? StateHelper.GetStateName<TState>() : entity;
 }

@@ -32,7 +32,7 @@ public class KeyValueStoreSettingsTests
     public void DefaultConstructorShouldInitializeWithDefaultValues()
     {
         // Act
-        var settings = new KeyValueStoreSettings();
+        KeyValueStoreSettings settings = new();
 
         // Assert
         settings.StorageRootPath.ShouldBe("/store");
@@ -47,7 +47,7 @@ public class KeyValueStoreSettingsTests
     public void PropertiesShouldAcceptNullValues()
     {
         // Arrange
-        var settings = new KeyValueStoreSettings
+        KeyValueStoreSettings settings = new()
         {
             // Act
             StorageRootPath = null,
@@ -68,7 +68,7 @@ public class KeyValueStoreSettingsTests
     public void PropertiesShouldBeSettable()
     {
         // Arrange
-        var settings = new KeyValueStoreSettings
+        KeyValueStoreSettings settings = new()
         {
             // Act
             StorageRootPath = "/custom/path",

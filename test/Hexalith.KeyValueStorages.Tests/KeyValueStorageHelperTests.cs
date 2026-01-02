@@ -26,7 +26,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreProviderShouldCreateStore()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = "/test";
@@ -52,7 +52,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldAllowMultipleRegistrations()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = "/test";
@@ -79,7 +79,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldRegisterService()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = "/test";
@@ -104,7 +104,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldThrowWhenNameIsEmpty()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddMemoryKeyValueStore(string.Empty));
@@ -117,7 +117,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldThrowWhenNameIsNull()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddMemoryKeyValueStore(null!));
@@ -130,7 +130,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldThrowWhenNameIsWhitespace()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddMemoryKeyValueStore("   "));
@@ -156,7 +156,7 @@ public class KeyValueStorageHelperTests
     public void AddMemoryKeyValueStoreShouldUseCustomParameters()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = "/test";

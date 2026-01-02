@@ -23,7 +23,7 @@ public class ExceptionTests
     public void ConcurrencyExceptionDefaultConstructorShouldCreateInstance()
     {
         // Act
-        var exception = new ConcurrencyException<string>();
+        ConcurrencyException<string> exception = new();
 
         // Assert
         _ = exception.ShouldNotBeNull();
@@ -44,7 +44,7 @@ public class ExceptionTests
         const string expectedEtag = "expected-etag-456";
 
         // Act
-        var exception = new ConcurrencyException<string>(key, etag, expectedEtag);
+        ConcurrencyException<string> exception = new(key, etag, expectedEtag);
 
         // Assert
         exception.Key.ShouldBe(key);
@@ -63,10 +63,10 @@ public class ExceptionTests
     {
         // Arrange
         const string message = "Test message";
-        var innerException = new InvalidOperationException("Inner exception");
+        InvalidOperationException innerException = new("Inner exception");
 
         // Act
-        var exception = new ConcurrencyException<string>(message, innerException);
+        ConcurrencyException<string> exception = new(message, innerException);
 
         // Assert
         exception.Message.ShouldBe(message);
@@ -83,7 +83,7 @@ public class ExceptionTests
         const string message = "Test message";
 
         // Act
-        var exception = new ConcurrencyException<string>(message);
+        ConcurrencyException<string> exception = new(message);
 
         // Assert
         exception.Message.ShouldBe(message);
@@ -104,7 +104,7 @@ public class ExceptionTests
         const string expectedEtag = "expected-etag-456";
 
         // Act
-        var exception = new ConcurrencyException<int>(key, etag, expectedEtag);
+        ConcurrencyException<int> exception = new(key, etag, expectedEtag);
 
         // Assert
         exception.Key.ShouldBe(key);
@@ -119,7 +119,7 @@ public class ExceptionTests
     public void DuplicateKeyExceptionDefaultConstructorShouldCreateInstance()
     {
         // Act
-        var exception = new DuplicateKeyException<string>();
+        DuplicateKeyException<string> exception = new();
 
         // Assert
         _ = exception.ShouldNotBeNull();
@@ -136,7 +136,7 @@ public class ExceptionTests
         const string key = "test-key";
 
         // Act
-        var exception = new DuplicateKeyException<string>(key);
+        DuplicateKeyException<string> exception = new(key);
 
         // Assert
         exception.Key.ShouldBe(key);
@@ -151,10 +151,10 @@ public class ExceptionTests
     {
         // Arrange
         const string message = "Test message";
-        var innerException = new InvalidOperationException("Inner exception");
+        InvalidOperationException innerException = new("Inner exception");
 
         // Act
-        var exception = new DuplicateKeyException<string>(message, innerException);
+        DuplicateKeyException<string> exception = new(message, innerException);
 
         // Assert
         exception.Message.ShouldBe(message);
@@ -171,7 +171,7 @@ public class ExceptionTests
         const string message = "Test message";
 
         // Act
-        var exception = new DuplicateKeyException<string>(message);
+        DuplicateKeyException<string> exception = new(message);
 
         // Assert
         exception.Message.ShouldBe(message);
@@ -187,7 +187,7 @@ public class ExceptionTests
         const int key = 42;
 
         // Act
-        var exception = new DuplicateKeyException<int>(key);
+        DuplicateKeyException<int> exception = new(key);
 
         // Assert
         exception.Key.ShouldBe(key);
@@ -204,7 +204,7 @@ public class ExceptionTests
         const long key = 123456789L;
 
         // Act
-        var exception = new DuplicateKeyException<long>(key);
+        DuplicateKeyException<long> exception = new(key);
 
         // Assert
         exception.Key.ShouldBe(key);

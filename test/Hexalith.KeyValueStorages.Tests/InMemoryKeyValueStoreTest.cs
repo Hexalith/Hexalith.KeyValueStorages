@@ -24,7 +24,7 @@ public class InMemoryKeyValueStoreTest
     public async Task AddAsyncShouldReturnInitialEtagWhenValueIsAdded()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -47,7 +47,7 @@ public class InMemoryKeyValueStoreTest
     public async Task AddAsyncShouldThrowInvalidOperationExceptionWhenKeyAlreadyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -66,7 +66,7 @@ public class InMemoryKeyValueStoreTest
     public async Task AddOrUpdateAsyncShouldAddValueWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -88,7 +88,7 @@ public class InMemoryKeyValueStoreTest
     public async Task AddOrUpdateAsyncShouldThrowConcurrencyExceptionWhenEtagDoesNotMatch()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -107,7 +107,7 @@ public class InMemoryKeyValueStoreTest
     public async Task AddOrUpdateAsyncShouldUpdateValueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -132,7 +132,7 @@ public class InMemoryKeyValueStoreTest
         // Arrange
         string database = UniqueIdHelper.GenerateUniqueStringId();
         string container = UniqueIdHelper.GenerateUniqueStringId();
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             database,
             container,
             TimeProvider.System);
@@ -157,7 +157,7 @@ public class InMemoryKeyValueStoreTest
     public async Task ContainsKeyAsyncShouldReturnFalseWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -177,7 +177,7 @@ public class InMemoryKeyValueStoreTest
     public async Task ContainsKeyAsyncShouldReturnTrueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -198,7 +198,7 @@ public class InMemoryKeyValueStoreTest
     public async Task ExistsAsyncShouldReturnFalseWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -218,7 +218,7 @@ public class InMemoryKeyValueStoreTest
     public async Task ExistsAsyncShouldReturnTrueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -239,10 +239,10 @@ public class InMemoryKeyValueStoreTest
     public async Task GetAsyncShouldReturnKeyNotFoundExceptionWhenValueHasExpired()
     {
         // Arrange
-        var timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        FakeTimeProvider timeProvider = new(DateTimeOffset.UtcNow);
         string database = UniqueIdHelper.GenerateUniqueStringId();
         string container = UniqueIdHelper.GenerateUniqueStringId();
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             database,
             container,
             timeProvider);
@@ -266,7 +266,7 @@ public class InMemoryKeyValueStoreTest
     public async Task GetAsyncShouldReturnValueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -288,7 +288,7 @@ public class InMemoryKeyValueStoreTest
     public async Task GetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -306,7 +306,7 @@ public class InMemoryKeyValueStoreTest
     public async Task RemoveAsyncShouldReturnFalseWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -326,7 +326,7 @@ public class InMemoryKeyValueStoreTest
     public async Task RemoveAsyncShouldReturnTrueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -348,7 +348,7 @@ public class InMemoryKeyValueStoreTest
     public async Task RemoveAsyncShouldThrowConcurrencyExceptionWhenEtagDoesNotMatch()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -367,7 +367,7 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsyncShouldThrowInvalidOperationExceptionWhenEtagDoesNotMatch()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -389,7 +389,7 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>();
+        InMemoryKeyValueStore<long, State<long>> store = new();
 
         // Act & Assert
         _ = await Should.ThrowAsync<KeyNotFoundException>(
@@ -404,7 +404,7 @@ public class InMemoryKeyValueStoreTest
     public async Task SetAsyncShouldUpdateValueAndReturnNewEtagWhenKeyExistsAndEtagMatches()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -429,10 +429,10 @@ public class InMemoryKeyValueStoreTest
     public async Task TimeToLiveCleanupShouldRemoveExpiredEntries()
     {
         // Arrange
-        var timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        FakeTimeProvider timeProvider = new(DateTimeOffset.UtcNow);
         string database = UniqueIdHelper.GenerateUniqueStringId();
         string container = UniqueIdHelper.GenerateUniqueStringId();
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             database,
             container,
             timeProvider);
@@ -462,10 +462,10 @@ public class InMemoryKeyValueStoreTest
     public async Task TryGetAsyncShouldReturnNullWhenValueHasExpired()
     {
         // Arrange
-        var timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        FakeTimeProvider timeProvider = new(DateTimeOffset.UtcNow);
         string database = UniqueIdHelper.GenerateUniqueStringId();
         string container = UniqueIdHelper.GenerateUniqueStringId();
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             database,
             container,
             timeProvider);
@@ -491,7 +491,7 @@ public class InMemoryKeyValueStoreTest
     public async Task TryGetValueAsyncShouldReturnNullWhenKeyDoesNotExist()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);
@@ -511,7 +511,7 @@ public class InMemoryKeyValueStoreTest
     public async Task TryGetValueAsyncShouldReturnValueWhenKeyExists()
     {
         // Arrange
-        var store = new InMemoryKeyValueStore<long, State<long>>(
+        InMemoryKeyValueStore<long, State<long>> store = new(
             UniqueIdHelper.GenerateUniqueStringId(),
             UniqueIdHelper.GenerateUniqueStringId(),
             TimeProvider.System);

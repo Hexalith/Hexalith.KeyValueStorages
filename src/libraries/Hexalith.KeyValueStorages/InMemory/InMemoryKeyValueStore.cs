@@ -132,10 +132,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     {
         using (_lock.EnterScope())
         {
-            var keysToRemove = _store.Keys
-                .Where(p => p.Database == Database && p.Container == Container)
-                .ToList();
-            foreach (InMemoryKey<TKey> key in keysToRemove)
+            foreach (InMemoryKey<TKey> key in (List<InMemoryKey<TKey>>)[.. _store.Keys.Where(p => p.Database == Database && p.Container == Container)])
             {
                 _ = _store.Remove(key);
                 _ = _timeToLive.Remove(key);
@@ -144,20 +141,19 @@ public class InMemoryKeyValueStore<TKey, TState>(
     }
 
     /// <inheritdoc/>
-    public override Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1229:Use async/await when necessary", Justification = "Do not await in locks")]
+    public override async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        bool result;
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
             CheckTimeToLive(storeKey);
-            if (_store.ContainsKey(storeKey))
-            {
-                return Task.FromResult(true);
-            }
-
-            return Task.FromResult(false);
+            result = _store.ContainsKey(storeKey);
         }
+
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -178,21 +174,22 @@ public class InMemoryKeyValueStore<TKey, TState>(
     }
 
     /// <inheritdoc/>
-    public override Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        TState? result;
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
             CheckTimeToLive(storeKey);
 
-            if (_store.TryGetValue(storeKey, out TState? value))
+            if (!_store.TryGetValue(storeKey, out result))
             {
-                return Task.FromResult(value);
+                throw new KeyNotFoundException($"Key {key} not found.");
             }
-
-            throw new KeyNotFoundException($"Key {key} not found.");
         }
+
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -260,10 +257,9 @@ public class InMemoryKeyValueStore<TKey, TState>(
         using (_lock.EnterScope())
         {
             DateTimeOffset now = TimeProvider.GetUtcNow();
-            var expiredKeys = _timeToLive
+            List<InMemoryKey<TKey>> expiredKeys = [.. _timeToLive
                 .Where(p => p.Value < now)
-                .Select(p => p.Key)
-                .ToList();
+                .Select(p => p.Key)];
             foreach (InMemoryKey<TKey> key in expiredKeys)
             {
                 // The key exists and has expired

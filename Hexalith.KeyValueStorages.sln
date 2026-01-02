@@ -85,6 +85,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hexalith.Builds", "Hexalith
 	ProjectSection(SolutionItems) = preProject
 		Hexalith.Builds\.clinerules = Hexalith.Builds\.clinerules
 		Hexalith.Builds\.cursorrules = Hexalith.Builds\.cursorrules
+		.editorconfig = .editorconfig
 		Hexalith.Builds\.gitignore = Hexalith.Builds\.gitignore
 		Hexalith.Builds\ai-assistant-instructions.md = Hexalith.Builds\ai-assistant-instructions.md
 		Hexalith.Builds\ai-commit-prompt.md = Hexalith.Builds\ai-commit-prompt.md
@@ -111,6 +112,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E720
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.SimpleApp", "src\examples\Hexalith.KeyValueStorages.SimpleApp\Hexalith.KeyValueStorages.SimpleApp.csproj", "{FC19D9F5-20FE-5300-3FB9-8E1E46021F76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{AE007C56-F762-483E-97D6-76E23E24D7CE}"
+	ProjectSection(SolutionItems) = preProject
+		Hexalith.Builds\Tools\editorconfig-symlink.ps1 = Hexalith.Builds\Tools\editorconfig-symlink.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,6 +175,7 @@ Global
 		{ACEC11B2-9E81-FF47-585D-69158486AF11} = {3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}
 		{E7207810-1119-FF2B-D42D-27CE324639FD} = {3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}
 		{FC19D9F5-20FE-5300-3FB9-8E1E46021F76} = {3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}
+		{AE007C56-F762-483E-97D6-76E23E24D7CE} = {3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B7376F4-B33A-4BC6-AFCA-C09B437568D7}

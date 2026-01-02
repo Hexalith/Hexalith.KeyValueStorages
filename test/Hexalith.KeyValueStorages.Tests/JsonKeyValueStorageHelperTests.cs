@@ -40,7 +40,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreProviderShouldCreateStore()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
@@ -66,7 +66,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldAllowMultipleRegistrations()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
@@ -93,7 +93,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldRegisterService()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
@@ -118,7 +118,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldThrowWhenNameIsEmpty()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddJsonFileKeyValueStore(string.Empty));
@@ -131,7 +131,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldThrowWhenNameIsNull()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddJsonFileKeyValueStore(null!));
@@ -157,14 +157,14 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldUseCustomJsonSerializerOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
             opt.DefaultDatabase = "testdb";
             opt.DefaultContainer = "testcontainer";
         });
-        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        JsonSerializerOptions options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         // Act
         _ = services.AddJsonFileKeyValueStore("test-store", options: options);
@@ -182,7 +182,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddJsonFileKeyValueStoreShouldUseCustomParameters()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
@@ -206,7 +206,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddPolymorphicJsonFileKeyValueStoreShouldRegisterService()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
@@ -231,7 +231,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     public void AddPolymorphicJsonFileKeyValueStoreShouldThrowWhenNameIsNull()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => services.AddPolymorphicJsonFileKeyValueStore(null!));
