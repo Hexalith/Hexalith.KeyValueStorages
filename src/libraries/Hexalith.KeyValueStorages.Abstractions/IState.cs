@@ -5,6 +5,8 @@
 
 namespace Hexalith.KeyValueStorages;
 
+using System;
+
 /// <summary>
 /// Represents a stored value with its etag.
 /// </summary>
