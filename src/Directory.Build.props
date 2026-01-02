@@ -6,10 +6,4 @@
 
   <!-- Import the parent Directory.Build.props file if it exists -->
   <Import Project="$(ParentDirectoryBuildProps)" Condition="Exists('$(ParentDirectoryBuildProps)')" />
-
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Hexalith.KeyValueStorages.Tests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
 </Project>

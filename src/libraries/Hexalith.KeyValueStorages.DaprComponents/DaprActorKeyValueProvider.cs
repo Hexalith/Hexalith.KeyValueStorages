@@ -30,12 +30,11 @@ public class DaprActorKeyValueProvider(
     public override IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(database);
-        var store = new DaprActorKeyValueStore<TKey, TState>(
+        return new DaprActorKeyValueStore<TKey, TState>(
             Settings,
             database,
             container,
             entity,
             TimeProvider);
-        return store;
     }
 }

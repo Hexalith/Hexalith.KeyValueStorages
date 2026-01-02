@@ -37,7 +37,7 @@ public abstract class KeyValueProvider : IKeyValueProvider
 
         if (string.IsNullOrWhiteSpace(database))
         {
-            SettingsException<KeyValueStoreSettings>.ThrowIfUndefined(settings.Value.DefaultDatabase);
+            SettingsException.ThrowIfUndefined<KeyValueStoreSettings>(settings.Value.DefaultDatabase);
             Database = settings.Value.DefaultDatabase;
         }
         else
@@ -47,7 +47,7 @@ public abstract class KeyValueProvider : IKeyValueProvider
 
         if (string.IsNullOrWhiteSpace(container))
         {
-            SettingsException<KeyValueStoreSettings>.ThrowIfUndefined(settings.Value.DefaultContainer);
+            SettingsException.ThrowIfUndefined<KeyValueStoreSettings>(settings.Value.DefaultContainer);
             Container = settings.Value.DefaultContainer;
         }
         else

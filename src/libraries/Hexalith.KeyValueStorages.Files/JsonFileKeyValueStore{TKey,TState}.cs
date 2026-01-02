@@ -60,12 +60,14 @@ public class JsonFileKeyValueStore<TKey, TState>(
     /// <inheritdoc/>
     protected override async Task<TState> ReadFromStreamAsync(Stream stream, CancellationToken cancellationToken)
         => await JsonSerializer.DeserializeAsync<TState>(stream, options, cancellationToken)
-            ?? throw new JsonException("Deserialization returned a null value");
+.ConfigureAwait(false) ?? throw new JsonException("Deserialization returned a null value");
 
     /// <inheritdoc/>
     protected override async Task WriteToStreamAsync(Stream stream, TState value, CancellationToken cancellationToken)
     {
-        await JsonSerializer.SerializeAsync(stream, value, options, cancellationToken);
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(stream);
+        await JsonSerializer.SerializeAsync(stream, value, options, cancellationToken).ConfigureAwait(false);
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 }

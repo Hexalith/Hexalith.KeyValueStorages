@@ -42,15 +42,11 @@ public static class KeyValueStorageHelper
         return services
             .AddKeyedTransient<IKeyValueProvider, InMemoryKeyValueProvider>(
                 name,
-                (sp, _) =>
-                {
-                    var store = new InMemoryKeyValueProvider(
+                (sp, _) => new InMemoryKeyValueProvider(
                         sp.GetRequiredService<IOptions<KeyValueStoreSettings>>(),
                         database,
                         container,
                         entity,
-                        sp.GetRequiredService<TimeProvider>());
-                    return store;
-                });
+                        sp.GetRequiredService<TimeProvider>()));
     }
 }

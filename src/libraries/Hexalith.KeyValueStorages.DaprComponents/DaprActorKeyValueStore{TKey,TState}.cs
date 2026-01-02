@@ -6,6 +6,7 @@
 namespace Hexalith.KeyValueStorages.DaprComponents;
 
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,10 +86,8 @@ public class DaprActorKeyValueStore<TKey, TState>
         {
             throw new ArgumentNullException(nameof(key), "key.ToString() cannot be null or empty");
         }
-        else
-        {
-            return key.ToString()!.ToRFC1123();
-        }
+
+        return key.ToString()!.ToRFC1123(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc/>

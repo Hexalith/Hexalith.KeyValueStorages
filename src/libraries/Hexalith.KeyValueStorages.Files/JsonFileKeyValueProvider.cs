@@ -57,15 +57,11 @@ public class JsonFileKeyValueProvider(
     }
 
     /// <inheritdoc/>
-    public override IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null)
-    {
-        var store = new JsonFileKeyValueStore<TKey, TState>(
+    public override IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null) => new JsonFileKeyValueStore<TKey, TState>(
             Settings,
             database,
             container,
             entity,
             options,
             TimeProvider);
-        return store;
-    }
 }

@@ -44,7 +44,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     /// </summary>
     public InMemoryKeyValueStore()
         : this(
-        Options.Create<KeyValueStoreSettings>(new KeyValueStoreSettings()),
+        Options.Create(new KeyValueStoreSettings()),
         null,
         null,
         null,
@@ -60,7 +60,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     /// <param name="timeProvider">The time provider to use for managing expiration times. If not provided, the system time provider is used.</param>
     public InMemoryKeyValueStore(string database, string container, TimeProvider? timeProvider)
         : this(
-        Options.Create<KeyValueStoreSettings>(new KeyValueStoreSettings()),
+        Options.Create(new KeyValueStoreSettings()),
         database,
         container,
         null,
@@ -71,6 +71,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     /// <inheritdoc/>
     public override Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(value);
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
@@ -102,11 +103,9 @@ public class InMemoryKeyValueStore<TKey, TState>(
             // The key already exists and has not expired
             return SetAsync(key, value, cancellationToken);
         }
-        else
-        {
-            // The key does not exist or has expired
-            return AddAsync(key, value, cancellationToken);
-        }
+
+        // The key does not exist or has expired
+        return AddAsync(key, value, cancellationToken);
     }
 
     /// <summary>
@@ -205,6 +204,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     /// <inheritdoc/>
     public override Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(value);
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
         {
@@ -255,20 +255,21 @@ public class InMemoryKeyValueStore<TKey, TState>(
     }
 
     /// <inheritdoc/>
-    public override Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
+    public override async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        TState? result = null;
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
             CheckTimeToLive(storeKey);
             if (_store.TryGetValue(storeKey, out TState? value))
             {
-                return Task.FromResult<TState?>(value);
+                result = value;
             }
-
-            return Task.FromResult<TState?>(null);
         }
+
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     private void CheckTimeToLive(InMemoryKey<TKey> storeKey)

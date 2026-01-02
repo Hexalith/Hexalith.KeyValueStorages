@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 /// <summary>
 /// Represents a view model for a country.
 /// </summary>
-public class CountryViewModel
+internal class CountryViewModel
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CountryViewModel"/> class.

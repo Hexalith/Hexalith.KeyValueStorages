@@ -15,7 +15,7 @@ using System.Runtime.Serialization;
 /// <param name="Currency">The currency used in the country.</param>
 /// <param name="PhonePrefix">The international phone prefix for the country.</param>
 [DataContract]
-public record Country(
+internal record Country(
    [property: DataMember(Order = 1)] string Code,
    [property: DataMember(Order = 2)] string Name,
    [property: DataMember(Order = 3)] string Currency,

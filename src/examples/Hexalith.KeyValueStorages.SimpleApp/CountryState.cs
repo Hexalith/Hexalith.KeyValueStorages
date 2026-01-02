@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 /// <param name="Etag"> The etag associated with the value.</param>
 /// <param name="TimeToLive"> The time to live for the value.</param>
 [DataContract(Name = "Countries")]
-public record CountryState(
+internal record CountryState(
     Country Value,
     string? Etag = null,
     TimeSpan? TimeToLive = null)

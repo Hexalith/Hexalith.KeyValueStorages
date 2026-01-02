@@ -45,18 +45,14 @@ public static class JsonKeyValueStorageHelper
         return services
             .AddKeyedTransient<IKeyValueProvider, JsonFileKeyValueProvider>(
                 name,
-                (sp, _) =>
-                {
-                    var store = new JsonFileKeyValueProvider(
+                (sp, _) => new JsonFileKeyValueProvider(
                         sp.GetRequiredService<IOptions<KeyValueStoreSettings>>(),
                         database,
                         container,
                         entity,
                         options ?? sp.GetService<JsonSerializerOptions>(),
                         sp.GetRequiredService<TimeProvider>()
-                        );
-                    return store;
-                });
+                        ));
     }
 
     /// <summary>
@@ -83,17 +79,13 @@ public static class JsonKeyValueStorageHelper
         return services
             .AddKeyedTransient<IKeyValueProvider, JsonFileKeyValueProvider>(
                 name,
-                (sp, _) =>
-                {
-                    var store = new JsonFileKeyValueProvider(
+                (sp, _) => new JsonFileKeyValueProvider(
                         sp.GetRequiredService<IOptions<KeyValueStoreSettings>>(),
                         database,
                         container,
                         entity,
                         PolymorphicHelper.DefaultJsonSerializerOptions,
                         sp.GetRequiredService<TimeProvider>()
-                        );
-                    return store;
-                });
+                        ));
     }
 }

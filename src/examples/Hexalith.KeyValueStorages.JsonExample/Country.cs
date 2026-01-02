@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 /// <param name="Name"> The country name.</param>
 /// /// <param name="Currency"> The currency used in the country.</param>
 [DataContract]
-public record Country(
+internal record Country(
     [property: DataMember(Order = 1)] string Code,
     [property: DataMember(Order = 2)] string Name,
     [property: DataMember(Order = 3)] string Currency);

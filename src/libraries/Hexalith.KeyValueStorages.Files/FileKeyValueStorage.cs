@@ -46,13 +46,16 @@ public abstract class FileKeyValueStorage<TKey, TState>
         TimeProvider? timeProvider = null)
         : base(settings, database, container, GetEntity(entity), timeProvider)
     {
-        SettingsException<KeyValueStoreSettings>.ThrowIfUndefined(settings.Value.StorageRootPath);
+        SettingsException.ThrowIfUndefined<KeyValueStoreSettings>(settings?.Value.StorageRootPath);
         _rootPath = settings.Value.StorageRootPath;
     }
 
     /// <inheritdoc/>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Not applicable")]
     public override async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        ArgumentNullException.ThrowIfNull(value);
         string filePath = GetFilePath(key);
 
         TState? state = await ReadAsync(filePath, cancellationToken).ConfigureAwait(false);
@@ -87,10 +90,8 @@ public abstract class FileKeyValueStorage<TKey, TState>
         {
             return await SetAsync(key, value, cancellationToken).ConfigureAwait(false);
         }
-        else
-        {
-            return await AddAsync(key, value, cancellationToken).ConfigureAwait(false);
-        }
+
+        return await AddAsync(key, value, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -133,7 +134,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
 
         string filePath = GetFilePath(key);
 
-        TState? value = await ReadAsync(filePath, cancellationToken);
+        TState? value = await ReadAsync(filePath, cancellationToken).ConfigureAwait(false);
 
         if (value is null)
         {
@@ -153,6 +154,8 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// <inheritdoc/>
     public override async Task<string> SetAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        ArgumentNullException.ThrowIfNull(value);
         string filePath = GetFilePath(key);
 
         TState current = await ReadAsync(filePath, cancellationToken).ConfigureAwait(false)
@@ -194,6 +197,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// <param name="filePath">The file path.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The deserialized value.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Not Applicable")]
     protected async Task<TState> ReadValueFromFileAsync(string filePath, CancellationToken cancellationToken)
     {
         await using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -207,6 +211,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// <returns>The sanitized file name.</returns>
     protected virtual string SanitizeFileName(string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName);
         char[] invalidChars = Path.GetInvalidFileNameChars();
         return string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
     }
@@ -227,6 +232,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
     /// <param name="value">The value to write.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Not applicable")]
     protected async Task WriteValueToFileAsync(string filePath, TState value, CancellationToken cancellationToken)
     {
         await using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -267,6 +273,6 @@ public abstract class FileKeyValueStorage<TKey, TState>
     private async Task<TState?> ReadAsync(TKey key, CancellationToken cancellationToken)
     {
         string filePath = GetFilePath(key);
-        return await ReadAsync(filePath, cancellationToken);
+        return await ReadAsync(filePath, cancellationToken).ConfigureAwait(false);
     }
 }

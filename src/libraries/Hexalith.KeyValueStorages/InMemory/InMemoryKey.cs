@@ -8,6 +8,9 @@ namespace Hexalith.KeyValueStorages.InMemory;
 /// Represents an in-memory key for a key-value storage.
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
+/// <param name="Database">The name of the database.</param>
+/// <param name="Container">The name of the container.</param>
+/// <param name="Key">The key value.</param>
 public record InMemoryKey<TKey>(
     string Database,
     string Container,

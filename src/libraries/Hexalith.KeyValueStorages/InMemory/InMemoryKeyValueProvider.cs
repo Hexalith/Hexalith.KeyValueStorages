@@ -30,12 +30,11 @@ public class InMemoryKeyValueProvider(
     public override IKeyValueStore<TKey, TState> Create<TKey, TState>(string? database = null, string? container = null, string? entity = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(database);
-        var store = new InMemoryKeyValueStore<TKey, TState>(
+        return new InMemoryKeyValueStore<TKey, TState>(
             Settings,
             database,
             container,
             entity,
             TimeProvider);
-        return store;
     }
 }

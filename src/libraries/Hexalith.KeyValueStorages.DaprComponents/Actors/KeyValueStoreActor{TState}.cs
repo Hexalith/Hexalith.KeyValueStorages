@@ -34,6 +34,7 @@ public class KeyValueStoreActor<TState>(ActorHost host)
     /// <inheritdoc/>
     public async Task<string> AddAsync(TState value, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(value);
         TState newValue = value with
         {
             Etag = value.Etag ?? UniqueIdHelper.GenerateUniqueStringId(),  // Generate a new Etag if not provided
@@ -68,7 +69,7 @@ public class KeyValueStoreActor<TState>(ActorHost host)
     /// <inheritdoc/>
     public async Task<bool> RemoveAsync(string etag, CancellationToken cancellationToken)
     {
-        ConditionalValue<TState> state = await StateManager.TryGetStateAsync<TState>(_stateName, cancellationToken);
+        ConditionalValue<TState> state = await StateManager.TryGetStateAsync<TState>(_stateName, cancellationToken).ConfigureAwait(false);
         if (state.HasValue && etag != state.Value.Etag)
         {
             throw new ConcurrencyException<string>(_stateName, state.Value.Etag ?? string.Empty, etag);
@@ -91,6 +92,7 @@ public class KeyValueStoreActor<TState>(ActorHost host)
     /// <inheritdoc/>
     public async Task<string> SetAsync(TState value, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(value);
         TState current = await GetAsync(cancellationToken).ConfigureAwait(false);
         if (!string.IsNullOrWhiteSpace(value.Etag) &&
             !string.IsNullOrWhiteSpace(current.Etag) &&
@@ -134,18 +136,16 @@ public class KeyValueStoreActor<TState>(ActorHost host)
             return _state;
         }
 
-        ConditionalValue<TState> result = await StateManager.TryGetStateAsync<TState>(_stateName, cancellationToken);
+        ConditionalValue<TState> result = await StateManager.TryGetStateAsync<TState>(_stateName, cancellationToken).ConfigureAwait(false);
         if (result.HasValue)
         {
             _state = result.Value;
             _stateLoaded = true;
             return result.Value;
         }
-        else
-        {
-            _stateLoaded = false;
-            _state = null;
-        }
+
+        _stateLoaded = false;
+        _state = null;
 
         return null;
     }

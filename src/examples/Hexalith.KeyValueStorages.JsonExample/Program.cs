@@ -14,12 +14,13 @@ using Hexalith.KeyValueStorages.Files;
 /// <summary>
 /// Example program demonstrating the usage of key-value stores.
 /// </summary>
-public static class Program
+internal static class Program
 {
     /// <summary>
     /// The main entry point for the application.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Sample")]
     public static async Task Main()
     {
         // Create JSON file key-value store with string keys and values
@@ -33,30 +34,30 @@ public static class Program
             _ = await jsonStore.AddAsync(
                 "FR",
                 new(new("FR", "France", "EUR")),
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
             string cnEtag = await jsonStore.AddAsync(
                 "CN",
                 new(new("CN", "China", "CNY")),
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
             string usEtag = await jsonStore.AddAsync(
                 "US",
                 new(new("US", "United States", "XXX")),
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
             _ = await jsonStore.AddAsync(
                 "VN",
                 new(new("VN", "Vietnam", "VND")),
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
 
             // Update the country information
             _ = await jsonStore.SetAsync(
                 "US",
                 new(new("US", "United States of America", "USD"), null, usEtag),
-                CancellationToken.None);
+                CancellationToken.None).ConfigureAwait(false);
 
             // Delete a country from the store
-            _ = await jsonStore.RemoveAsync("CN", cnEtag, CancellationToken.None);
+            _ = await jsonStore.RemoveAsync("CN", cnEtag, CancellationToken.None).ConfigureAwait(false);
 
-            CountryState usa = await jsonStore.GetAsync("US", CancellationToken.None);
+            CountryState usa = await jsonStore.GetAsync("US", CancellationToken.None).ConfigureAwait(false);
 
             Console.WriteLine($"Country: {usa.Value.Name}, Currency: {usa.Value.Currency}, Etag: {usa.Etag}");
         }

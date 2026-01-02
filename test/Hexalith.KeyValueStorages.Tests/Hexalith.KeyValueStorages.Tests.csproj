@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);IDE0079;RCS1251;S3881;</NoWarn>
+    <NoWarn>$(NoWarn);IDE0079;RCS1251;S3881;VSTHRD111;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\packages\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
-    <ProjectReference Include="..\..\src\packages\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
+    <ProjectReference Include="..\..\src\libraries\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />
+    <ProjectReference Include="..\..\src\libraries\Hexalith.KeyValueStorages\Hexalith.KeyValueStorages.csproj" />
   </ItemGroup>
 
   <ItemGroup>

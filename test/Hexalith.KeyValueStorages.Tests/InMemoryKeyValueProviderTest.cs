@@ -20,101 +20,101 @@ public class InMemoryKeyValueProviderTest
     /// Tests that the Create method creates an instance of InMemoryKeyValueStore with the correct parameters.
     /// </summary>
     [Fact]
-    public void Create_ShouldReturnInMemoryKeyValueStore_WhenValidParameters()
+    public void CreateShouldReturnInMemoryKeyValueStoreWhenValidParameters()
     {
         // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
-        string database = "testdb";
-        string container = "testcontainer";
-        string entity = "testentity";
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
+        const string database = "testdb";
+        const string container = "testcontainer";
+        const string entity = "testentity";
         var provider = new InMemoryKeyValueProvider(settings, database, container, entity, TimeProvider.System);
 
         // Act
-        var store = provider.Create<string, State<string>>(database, container, entity);
+        IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>(database, container, entity);
 
         // Assert
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
-    }
-
-    /// <summary>
-    /// Tests that the Create method uses the constructor parameters when only database parameter is provided.
-    /// </summary>
-    [Fact]
-    public void Create_ShouldUseConstructorParameters_WhenMethodParametersNotProvided()
-    {
-        // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
-        string database = "testdb";
-        string container = "testcontainer";
-        string entity = "testentity";
-        var provider = new InMemoryKeyValueProvider(settings, database, container, entity, TimeProvider.System);
-
-        // Act
-        var store = provider.Create<string, State<string>>(database);
-
-        // Assert
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
-    }
-
-    /// <summary>
-    /// Tests that the Create method throws an ArgumentException when the database parameter is null.
-    /// </summary>
-    [Fact]
-    public void Create_ShouldThrowArgumentException_WhenDatabaseIsNull()
-    {
-        // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
-
-        // Act & Assert
-        Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(null));
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
     }
 
     /// <summary>
     /// Tests that the Create method throws an ArgumentException when the database parameter is empty.
     /// </summary>
     [Fact]
-    public void Create_ShouldThrowArgumentException_WhenDatabaseIsEmpty()
+    public void CreateShouldThrowArgumentExceptionWhenDatabaseIsEmpty()
     {
         // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
         var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(""));
+        _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(string.Empty));
+    }
+
+    /// <summary>
+    /// Tests that the Create method throws an ArgumentException when the database parameter is null.
+    /// </summary>
+    [Fact]
+    public void CreateShouldThrowArgumentExceptionWhenDatabaseIsNull()
+    {
+        // Arrange
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
+        var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
+
+        // Act & Assert
+        _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(null));
     }
 
     /// <summary>
     /// Tests that the Create method throws an ArgumentException when the database parameter is whitespace.
     /// </summary>
     [Fact]
-    public void Create_ShouldThrowArgumentException_WhenDatabaseIsWhitespace()
+    public void CreateShouldThrowArgumentExceptionWhenDatabaseIsWhitespace()
     {
         // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
         var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(" "));
+        _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(" "));
+    }
+
+    /// <summary>
+    /// Tests that the Create method uses the constructor parameters when only database parameter is provided.
+    /// </summary>
+    [Fact]
+    public void CreateShouldUseConstructorParametersWhenMethodParametersNotProvided()
+    {
+        // Arrange
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
+        const string database = "testdb";
+        const string container = "testcontainer";
+        const string entity = "testentity";
+        var provider = new InMemoryKeyValueProvider(settings, database, container, entity, TimeProvider.System);
+
+        // Act
+        IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>(database);
+
+        // Assert
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
     }
 
     /// <summary>
     /// Tests that the Create method creates an instance with overridden parameters.
     /// </summary>
     [Fact]
-    public void Create_ShouldUseOverriddenParameters_WhenProvided()
+    public void CreateShouldUseOverriddenParametersWhenProvided()
     {
         // Arrange
-        var settings = Options.Create(new KeyValueStoreSettings());
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
         var provider = new InMemoryKeyValueProvider(settings, "defaultdb", "defaultcontainer", "defaultentity", TimeProvider.System);
 
         // Act
-        var store = provider.Create<string, State<string>>("overriddendb", "overriddencontainer", "overriddenentity");
+        IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>("overriddendb", "overriddencontainer", "overriddenentity");
 
         // Assert
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<InMemoryKeyValueStore<string, State<string>>>();
     }
-} 
+}

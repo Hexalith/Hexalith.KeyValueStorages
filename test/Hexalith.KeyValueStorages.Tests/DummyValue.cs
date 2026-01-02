@@ -10,7 +10,7 @@ using System;
 /// <summary>
 /// Represents a dummy value for testing.
 /// </summary>
-public record DummyValue
+internal record DummyValue
 {
     /// <summary>
     /// Gets or sets the name.

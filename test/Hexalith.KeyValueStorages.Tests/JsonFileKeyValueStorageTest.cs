@@ -23,7 +23,7 @@ using Xunit;
 /// <summary>
 /// Unit tests for the <see cref="JsonFileKeyValueStore{TKey, TState}"/> class.
 /// </summary>
-public partial class JsonFileKeyValueStorageTest : IDisposable
+public class JsonFileKeyValueStorageTest : IDisposable
 {
     private readonly JsonFileKeyValueStore<string, State<DummyValue>> _storage;
     private readonly string _testDirectory;
@@ -57,7 +57,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task AddAsync_ShouldReturnInitialEtag_WhenValueIsAdded()
+    public async Task AddAsyncShouldReturnInitialEtagWhenValueIsAdded()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -82,7 +82,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task AddAsync_ShouldThrowInvalidOperationException_WhenKeyAlreadyExists()
+    public async Task AddAsyncShouldThrowInvalidOperationExceptionWhenKeyAlreadyExists()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -97,7 +97,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
 
         // Act & Assert
         _ = await Should.ThrowAsync<DuplicateKeyException<string>>(
-            async () => await _storage.AddAsync("key1", state, CancellationToken.None));
+            async () => await _storage.AddAsync("key1", state, CancellationToken.None).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task ContainsKeyAsync_ShouldReturnFalse_WhenKeyDoesNotExist()
+    public async Task ContainsKeyAsyncShouldReturnFalseWhenKeyDoesNotExist()
     {
         // Act
         bool result = await _storage.ContainsKeyAsync("nonexistent", CancellationToken.None);
@@ -119,7 +119,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task ContainsKeyAsync_ShouldReturnTrue_WhenKeyExists()
+    public async Task ContainsKeyAsyncShouldReturnTrueWhenKeyExists()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -153,7 +153,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAsync_ShouldReturnNull_WhenValueHasExpired()
+    public async Task GetAsyncShouldReturnNullWhenValueHasExpired()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -184,7 +184,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAsync_ShouldReturnValue_WhenKeyExists()
+    public async Task GetAsyncShouldReturnValueWhenKeyExists()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -212,18 +212,18 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAsync_ShouldThrowKeyNotFoundException_WhenKeyDoesNotExist() =>
+    public async Task GetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist() =>
 
         // Act & Assert
         await Should.ThrowAsync<KeyNotFoundException>(
-            async () => await _storage.GetAsync("nonexistent", CancellationToken.None));
+            async () => await _storage.GetAsync("nonexistent", CancellationToken.None).ConfigureAwait(false));
 
     /// <summary>
     /// Tests the RemoveAsync method of the JsonFileKeyValueStorage class.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task RemoveAsync_ShouldReturnFalse_WhenKeyDoesNotExist()
+    public async Task RemoveAsyncShouldReturnFalseWhenKeyDoesNotExist()
     {
         // Act
         bool result = await _storage.RemoveAsync("nonexistent", null, CancellationToken.None);
@@ -237,7 +237,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task RemoveAsync_ShouldReturnTrue_WhenKeyExists()
+    public async Task RemoveAsyncShouldReturnTrueWhenKeyExists()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -264,7 +264,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task RemoveAsync_ShouldThrowConcurrencyException_WhenEtagDoesNotMatch()
+    public async Task RemoveAsyncShouldThrowConcurrencyExceptionWhenEtagDoesNotMatch()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -279,7 +279,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
 
         // Act & Assert
         _ = await Should.ThrowAsync<ConcurrencyException<string>>(
-            async () => await _storage.RemoveAsync("key1", "bad-etag", CancellationToken.None));
+            async () => await _storage.RemoveAsync("key1", "bad-etag", CancellationToken.None).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -287,7 +287,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task SetAsync_ShouldThrowConcurrencyException_WhenEtagDoesNotMatch()
+    public async Task SetAsyncShouldThrowConcurrencyExceptionWhenEtagDoesNotMatch()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -305,7 +305,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
             async () => await _storage.SetAsync(
                 "key1",
                 new State<DummyValue>(dummyValue, "bad-etag", null),
-                CancellationToken.None));
+                CancellationToken.None).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -313,7 +313,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task SetAsync_ShouldThrowKeyNotFoundException_WhenKeyDoesNotExist()
+    public async Task SetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -326,7 +326,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
 
         // Act & Assert
         _ = await Should.ThrowAsync<KeyNotFoundException>(
-            async () => await _storage.SetAsync("nonexistent", new State<DummyValue>(dummyValue, null, null), CancellationToken.None));
+            async () => await _storage.SetAsync("nonexistent", new State<DummyValue>(dummyValue, null, null), CancellationToken.None).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -334,7 +334,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task SetAsync_ShouldUpdateValueAndReturnNewEtag_WhenKeyExistsAndEtagMatches()
+    public async Task SetAsyncShouldUpdateValueAndReturnNewEtagWhenKeyExistsAndEtagMatches()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -374,7 +374,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task TryGetAsync_ShouldReturnNull_WhenKeyDoesNotExist()
+    public async Task TryGetAsyncShouldReturnNullWhenKeyDoesNotExist()
     {
         // Act
         State<DummyValue>? result = await _storage.TryGetAsync("nonexistent", CancellationToken.None);
@@ -388,7 +388,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task TryGetAsync_ShouldReturnValue_WhenKeyExists()
+    public async Task TryGetAsyncShouldReturnValueWhenKeyExists()
     {
         // Arrange
         var dummyValue = new DummyValue
@@ -416,6 +416,7 @@ public partial class JsonFileKeyValueStorageTest : IDisposable
     /// Disposes the test resources.
     /// </summary>
     /// <param name="disposing">Whether the method is being called from Dispose().</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Not applicable")]
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)

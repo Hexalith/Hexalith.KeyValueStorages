@@ -42,21 +42,18 @@ public static class ServiceCollectionExtensions
     /// <param name="database">The name of the database. If not provided, the setting value is used.</param>
     /// <param name="container">The name of the container. If not provided, the setting value is used.</param>
     /// <param name="entity">The name of the entity. If not provided, the state object data contract name is used or the type name.</param>
-    /// <param name="keyToActorId">Optional function to convert the key to an actor ID. If not provided, a default conversion is used.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddDaprActorKeyValueStorage<TKey, TState>(
         this IServiceCollection services,
         string name,
         string? database = null,
         string? container = null,
-        string? entity = null,
-        Func<TKey, string>? keyToActorId = null)
+        string? entity = null)
         where TKey : notnull, IEquatable<TKey>
         where TState : StateBase
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(database);
         ArgumentNullException.ThrowIfNull(services);
-        keyToActorId ??= DaprActorKeyValueStore<TKey, TState>.KeyToRfc1123;
 
         // Register the actor with the Dapr runtime
         return services

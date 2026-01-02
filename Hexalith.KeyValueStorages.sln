@@ -41,13 +41,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".project", ".project", "{59
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{3E198984-7A1D-4A63-BB49-FCF1B9AA5EF2}"
 	ProjectSection(SolutionItems) = preProject
-		samples\Directory.Build.Props = samples\Directory.Build.Props
 		examples\README.md = examples\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{7ECDCCA0-1CA1-446A-97EC-310AEEEAF184}"
 	ProjectSection(SolutionItems) = preProject
-		src\Directory.Build.props = src\Directory.Build.props
+		src\libraries\Directory.Build.props = src\libraries\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{2346D241-A9CB-4C17-A290-4617F2161376}"
