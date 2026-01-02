@@ -85,12 +85,9 @@ public abstract class FileKeyValueStorage<TKey, TState>
     public override async Task<string> AddOrUpdateAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
         string filePath = GetFilePath(key);
-        if (File.Exists(filePath))
-        {
-            return await SetAsync(key, value, cancellationToken).ConfigureAwait(false);
-        }
-
-        return await AddAsync(key, value, cancellationToken).ConfigureAwait(false);
+        return File.Exists(filePath)
+            ? await SetAsync(key, value, cancellationToken).ConfigureAwait(false)
+            : await AddAsync(key, value, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

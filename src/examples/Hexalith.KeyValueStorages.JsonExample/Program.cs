@@ -24,7 +24,7 @@ internal static class Program
     public static async Task Main()
     {
         // Create JSON file key-value store with string keys and values
-        var jsonStore = new JsonFileKeyValueStore<string, CountryState>();
+        JsonFileKeyValueStore<string, CountryState> jsonStore = new();
 
         try
         {

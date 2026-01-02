@@ -27,7 +27,7 @@ public class InMemoryKeyValueProviderTest
         const string database = "testdb";
         const string container = "testcontainer";
         const string entity = "testentity";
-        var provider = new InMemoryKeyValueProvider(settings, database, container, entity, TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, database, container, entity, TimeProvider.System);
 
         // Act
         IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>(database, container, entity);
@@ -45,7 +45,7 @@ public class InMemoryKeyValueProviderTest
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, null, null, null, TimeProvider.System);
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(string.Empty));
@@ -59,7 +59,7 @@ public class InMemoryKeyValueProviderTest
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, null, null, null, TimeProvider.System);
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(null));
@@ -73,7 +73,7 @@ public class InMemoryKeyValueProviderTest
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new InMemoryKeyValueProvider(settings, null, null, null, TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, null, null, null, TimeProvider.System);
 
         // Act & Assert
         _ = Should.Throw<ArgumentException>(() => provider.Create<string, State<string>>(" "));
@@ -90,7 +90,7 @@ public class InMemoryKeyValueProviderTest
         const string database = "testdb";
         const string container = "testcontainer";
         const string entity = "testentity";
-        var provider = new InMemoryKeyValueProvider(settings, database, container, entity, TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, database, container, entity, TimeProvider.System);
 
         // Act
         IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>(database);
@@ -108,7 +108,7 @@ public class InMemoryKeyValueProviderTest
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new InMemoryKeyValueProvider(settings, "defaultdb", "defaultcontainer", "defaultentity", TimeProvider.System);
+        InMemoryKeyValueProvider provider = new(settings, "defaultdb", "defaultcontainer", "defaultentity", TimeProvider.System);
 
         // Act
         IKeyValueStore<string, State<string>> store = provider.Create<string, State<string>>("overriddendb", "overriddencontainer", "overriddenentity");

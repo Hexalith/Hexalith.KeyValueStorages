@@ -82,12 +82,9 @@ public class DaprActorKeyValueStore<TKey, TState>
     {
         ArgumentNullException.ThrowIfNull(key);
         string? keyString = key.ToString();
-        if (string.IsNullOrWhiteSpace(keyString))
-        {
-            throw new ArgumentNullException(nameof(key), "key.ToString() cannot be null or empty");
-        }
-
-        return key.ToString()!.ToRFC1123(CultureInfo.InvariantCulture);
+        return string.IsNullOrWhiteSpace(keyString)
+            ? throw new ArgumentNullException(nameof(key), "key.ToString() cannot be null or empty")
+            : key.ToString()!.ToRFC1123(CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc/>

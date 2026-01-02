@@ -26,12 +26,12 @@ public class JsonFileKeyValueProviderTests
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var options = new JsonSerializerOptions
+        JsonSerializerOptions options = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
         };
-        var provider = new JsonFileKeyValueProvider(
+        JsonFileKeyValueProvider provider = new(
             settings,
             "testdb",
             "testcontainer",
@@ -64,8 +64,8 @@ public class JsonFileKeyValueProviderTests
         const string database = "testdb";
         const string container = "testcontainer";
         const string entity = "testentity";
-        var options = new JsonSerializerOptions();
-        var provider = new JsonFileKeyValueProvider(
+        JsonSerializerOptions options = new();
+        JsonFileKeyValueProvider provider = new(
             settings,
             database,
             container,
@@ -92,8 +92,8 @@ public class JsonFileKeyValueProviderTests
         const string database = "testdb";
         const string container = "testcontainer";
         const string entity = "testentity";
-        var options = new JsonSerializerOptions();
-        var provider = new JsonFileKeyValueProvider(
+        JsonSerializerOptions options = new();
+        JsonFileKeyValueProvider provider = new(
             settings,
             database,
             container,
@@ -117,7 +117,7 @@ public class JsonFileKeyValueProviderTests
     {
         // Arrange
         IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
-        var provider = new JsonFileKeyValueProvider(
+        JsonFileKeyValueProvider provider = new(
             settings,
             "defaultdb",
             "defaultcontainer",
@@ -140,7 +140,7 @@ public class JsonFileKeyValueProviderTests
     public void DefaultConstructorShouldCreateInstanceWithDefaultValues()
     {
         // Arrange & Act
-        var provider = new JsonFileKeyValueProvider();
+        JsonFileKeyValueProvider provider = new();
 
         // Assert
         _ = provider.ShouldNotBeNull();
@@ -156,13 +156,13 @@ public class JsonFileKeyValueProviderTests
     public void JsonOptionsConstructorShouldCreateInstanceWithOptions()
     {
         // Arrange
-        var options = new JsonSerializerOptions
+        JsonSerializerOptions options = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
         // Act
-        var provider = new JsonFileKeyValueProvider(options);
+        JsonFileKeyValueProvider provider = new(options);
 
         // Assert
         _ = provider.ShouldNotBeNull();
@@ -183,13 +183,13 @@ public class JsonFileKeyValueProviderTests
             DefaultDatabase = "customdb",
             DefaultContainer = "customcontainer",
         });
-        var options = new JsonSerializerOptions();
+        JsonSerializerOptions options = new();
         const string database = "testdb";
         const string container = "testcontainer";
         const string entity = "testentity";
 
         // Act
-        var provider = new JsonFileKeyValueProvider(
+        JsonFileKeyValueProvider provider = new(
             settings,
             database,
             container,
