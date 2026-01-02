@@ -10,28 +10,10 @@ using System;
 using Shouldly;
 
 /// <summary>
-/// Unit tests for State and StateBase classes.
+/// Unit tests for <see cref="State{T}"/> and <see cref="StateBase"/>.
 /// </summary>
 public class StateTests
 {
-    /// <summary>
-    /// Tests StateBase constructor with all parameters.
-    /// </summary>
-    [Fact]
-    public void StateBaseConstructorShouldSetAllProperties()
-    {
-        // Arrange
-        const string etag = "test-etag";
-        TimeSpan ttl = TimeSpan.FromMinutes(5);
-
-        // Act
-        var state = new TestState(etag, ttl);
-
-        // Assert
-        state.Etag.ShouldBe(etag);
-        state.TimeToLive.ShouldBe(ttl);
-    }
-
     /// <summary>
     /// Tests StateBase constructor with null values.
     /// </summary>
@@ -44,6 +26,44 @@ public class StateTests
         // Assert
         state.Etag.ShouldBeNull();
         state.TimeToLive.ShouldBeNull();
+    }
+
+    /// <summary>
+    /// Tests StateBase constructor with all parameters.
+    /// </summary>
+    [Fact]
+    public void StateBaseConstructorShouldSetAllProperties()
+    {
+        // Arrange
+        const string etag = "test-etag";
+        var ttl = TimeSpan.FromMinutes(5);
+
+        // Act
+        var state = new TestState(etag, ttl);
+
+        // Assert
+        state.Etag.ShouldBe(etag);
+        state.TimeToLive.ShouldBe(ttl);
+    }
+
+    /// <summary>
+    /// Tests State constructor with all parameters.
+    /// </summary>
+    [Fact]
+    public void StateConstructorShouldSetAllProperties()
+    {
+        // Arrange
+        const string value = "test-value";
+        const string etag = "test-etag";
+        var ttl = TimeSpan.FromMinutes(5);
+
+        // Act
+        var state = new State<string>(value, etag, ttl);
+
+        // Assert
+        state.Value.ShouldBe(value);
+        state.Etag.ShouldBe(etag);
+        state.TimeToLive.ShouldBe(ttl);
     }
 
     /// <summary>
@@ -65,37 +85,19 @@ public class StateTests
     }
 
     /// <summary>
-    /// Tests State constructor with all parameters.
+    /// Tests State record equality.
     /// </summary>
     [Fact]
-    public void StateConstructorShouldSetAllProperties()
+    public void StateEqualityShouldCompareAllProperties()
     {
         // Arrange
-        const string value = "test-value";
-        const string etag = "test-etag";
-        TimeSpan ttl = TimeSpan.FromMinutes(5);
-
-        // Act
-        var state = new State<string>(value, etag, ttl);
+        var state1 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
+        var state2 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
+        var state3 = new State<string>("value", "different-etag", TimeSpan.FromMinutes(5));
 
         // Assert
-        state.Value.ShouldBe(value);
-        state.Etag.ShouldBe(etag);
-        state.TimeToLive.ShouldBe(ttl);
-    }
-
-    /// <summary>
-    /// Tests State with different value types.
-    /// </summary>
-    [Fact]
-    public void StateWithIntegerValueShouldWork()
-    {
-        // Act
-        var state = new State<int>(42, "etag", null);
-
-        // Assert
-        state.Value.ShouldBe(42);
-        state.Etag.ShouldBe("etag");
+        state1.ShouldBe(state2);
+        state1.ShouldNotBe(state3);
     }
 
     /// <summary>
@@ -133,7 +135,7 @@ public class StateTests
         var original = new State<string>("value", "old-etag", null);
 
         // Act
-        var modified = original with { Etag = "new-etag" };
+        State<string> modified = original with { Etag = "new-etag" };
 
         // Assert
         modified.Value.ShouldBe("value");
@@ -142,19 +144,17 @@ public class StateTests
     }
 
     /// <summary>
-    /// Tests State record equality.
+    /// Tests State with different value types.
     /// </summary>
     [Fact]
-    public void StateEqualityShouldCompareAllProperties()
+    public void StateWithIntegerValueShouldWork()
     {
-        // Arrange
-        var state1 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
-        var state2 = new State<string>("value", "etag", TimeSpan.FromMinutes(5));
-        var state3 = new State<string>("value", "different-etag", TimeSpan.FromMinutes(5));
+        // Act
+        var state = new State<int>(42, "etag", null);
 
         // Assert
-        state1.ShouldBe(state2);
-        state1.ShouldNotBe(state3);
+        state.Value.ShouldBe(42);
+        state.Etag.ShouldBe("etag");
     }
 
     /// <summary>
@@ -173,5 +173,7 @@ public class StateTests
     /// <summary>
     /// A test state record that inherits from StateBase.
     /// </summary>
+    /// <param name="Etag">Etag for concurrency control.</param>
+    /// <param name="TimeToLive">Time to live for the state.</param>
     private record TestState(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 }

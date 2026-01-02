@@ -13,6 +13,19 @@ using Shouldly;
 public class KeyValueStoreSettingsTests
 {
     /// <summary>
+    /// Tests that ConfigurationName returns the expected configuration section name.
+    /// </summary>
+    [Fact]
+    public void ConfigurationNameShouldReturnExpectedValue()
+    {
+        // Act
+        string result = KeyValueStoreSettings.ConfigurationName();
+
+        // Assert
+        result.ShouldBe("Hexalith:KeyValueStorages");
+    }
+
+    /// <summary>
     /// Tests that the default constructor initializes properties with default values.
     /// </summary>
     [Fact]
@@ -25,39 +38,6 @@ public class KeyValueStoreSettingsTests
         settings.StorageRootPath.ShouldBe("/store");
         settings.DefaultDatabase.ShouldBe("database");
         settings.DefaultContainer.ShouldBe("container");
-    }
-
-    /// <summary>
-    /// Tests that properties can be set to custom values.
-    /// </summary>
-    [Fact]
-    public void PropertiesShouldBeSettable()
-    {
-        // Arrange
-        var settings = new KeyValueStoreSettings();
-
-        // Act
-        settings.StorageRootPath = "/custom/path";
-        settings.DefaultDatabase = "customdb";
-        settings.DefaultContainer = "customcontainer";
-
-        // Assert
-        settings.StorageRootPath.ShouldBe("/custom/path");
-        settings.DefaultDatabase.ShouldBe("customdb");
-        settings.DefaultContainer.ShouldBe("customcontainer");
-    }
-
-    /// <summary>
-    /// Tests that ConfigurationName returns the expected configuration section name.
-    /// </summary>
-    [Fact]
-    public void ConfigurationNameShouldReturnExpectedValue()
-    {
-        // Act
-        string result = KeyValueStoreSettings.ConfigurationName();
-
-        // Assert
-        result.ShouldBe("Hexalith:KeyValueStorages");
     }
 
     /// <summary>
@@ -79,5 +59,26 @@ public class KeyValueStoreSettingsTests
         settings.StorageRootPath.ShouldBeNull();
         settings.DefaultDatabase.ShouldBeNull();
         settings.DefaultContainer.ShouldBeNull();
+    }
+
+    /// <summary>
+    /// Tests that properties can be set to custom values.
+    /// </summary>
+    [Fact]
+    public void PropertiesShouldBeSettable()
+    {
+        // Arrange
+        var settings = new KeyValueStoreSettings
+        {
+            // Act
+            StorageRootPath = "/custom/path",
+            DefaultDatabase = "customdb",
+            DefaultContainer = "customcontainer",
+        };
+
+        // Assert
+        settings.StorageRootPath.ShouldBe("/custom/path");
+        settings.DefaultDatabase.ShouldBe("customdb");
+        settings.DefaultContainer.ShouldBe("customcontainer");
     }
 }

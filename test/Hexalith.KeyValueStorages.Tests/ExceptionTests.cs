@@ -26,26 +26,7 @@ public class ExceptionTests
         var exception = new ConcurrencyException<string>();
 
         // Assert
-        exception.ShouldNotBeNull();
-        exception.Key.ShouldBeNull();
-        exception.Etag.ShouldBeNull();
-        exception.ExpectedEtag.ShouldBeNull();
-    }
-
-    /// <summary>
-    /// Tests the message constructor of ConcurrencyException.
-    /// </summary>
-    [Fact]
-    public void ConcurrencyExceptionMessageConstructorShouldSetMessage()
-    {
-        // Arrange
-        const string message = "Test message";
-
-        // Act
-        var exception = new ConcurrencyException<string>(message);
-
-        // Assert
-        exception.Message.ShouldBe(message);
+        _ = exception.ShouldNotBeNull();
         exception.Key.ShouldBeNull();
         exception.Etag.ShouldBeNull();
         exception.ExpectedEtag.ShouldBeNull();
@@ -93,6 +74,25 @@ public class ExceptionTests
     }
 
     /// <summary>
+    /// Tests the message constructor of ConcurrencyException.
+    /// </summary>
+    [Fact]
+    public void ConcurrencyExceptionMessageConstructorShouldSetMessage()
+    {
+        // Arrange
+        const string message = "Test message";
+
+        // Act
+        var exception = new ConcurrencyException<string>(message);
+
+        // Assert
+        exception.Message.ShouldBe(message);
+        exception.Key.ShouldBeNull();
+        exception.Etag.ShouldBeNull();
+        exception.ExpectedEtag.ShouldBeNull();
+    }
+
+    /// <summary>
     /// Tests ConcurrencyException with integer key type.
     /// </summary>
     [Fact]
@@ -122,24 +122,8 @@ public class ExceptionTests
         var exception = new DuplicateKeyException<string>();
 
         // Assert
-        exception.ShouldNotBeNull();
+        _ = exception.ShouldNotBeNull();
         exception.Key.ShouldBeNull();
-    }
-
-    /// <summary>
-    /// Tests the message constructor of DuplicateKeyException.
-    /// </summary>
-    [Fact]
-    public void DuplicateKeyExceptionMessageConstructorShouldSetMessage()
-    {
-        // Arrange
-        const string message = "Test message";
-
-        // Act
-        var exception = new DuplicateKeyException<string>(message);
-
-        // Assert
-        exception.Message.ShouldBe(message);
     }
 
     /// <summary>
@@ -175,6 +159,22 @@ public class ExceptionTests
         // Assert
         exception.Message.ShouldBe(message);
         exception.InnerException.ShouldBe(innerException);
+    }
+
+    /// <summary>
+    /// Tests the message constructor of DuplicateKeyException.
+    /// </summary>
+    [Fact]
+    public void DuplicateKeyExceptionMessageConstructorShouldSetMessage()
+    {
+        // Arrange
+        const string message = "Test message";
+
+        // Act
+        var exception = new DuplicateKeyException<string>(message);
+
+        // Assert
+        exception.Message.ShouldBe(message);
     }
 
     /// <summary>

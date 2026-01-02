@@ -13,12 +13,13 @@ using Hexalith.KeyValueStorages.Helpers;
 using Shouldly;
 
 /// <summary>
-/// Unit tests for the StateHelper class.
+/// Unit tests for the <see cref="StateHelper"/> class.
 /// </summary>
 public class StateHelperTests
 {
     /// <summary>
-    /// Tests that GetStateName returns the DataContract name when the attribute is present.
+    /// Tests that <see cref="StateHelper.GetStateName{TState}"/> returns the <see cref="DataContractAttribute.Name"/>
+    /// value when the attribute is present and a name is specified.
     /// </summary>
     [Fact]
     public void GetStateNameShouldReturnDataContractNameWhenAttributeIsPresent()
@@ -31,33 +32,7 @@ public class StateHelperTests
     }
 
     /// <summary>
-    /// Tests that GetStateName returns the type name when no DataContract attribute is present.
-    /// </summary>
-    [Fact]
-    public void GetStateNameShouldReturnTypeNameWhenNoDataContractAttribute()
-    {
-        // Act
-        string result = StateHelper.GetStateName<TestStateWithoutDataContract>();
-
-        // Assert
-        result.ShouldBe(nameof(TestStateWithoutDataContract));
-    }
-
-    /// <summary>
-    /// Tests that GetStateName returns the type name when DataContract has no Name property.
-    /// </summary>
-    [Fact]
-    public void GetStateNameShouldReturnTypeNameWhenDataContractHasNoName()
-    {
-        // Act
-        string result = StateHelper.GetStateName<TestStateWithDataContractNoName>();
-
-        // Assert
-        result.ShouldBe(nameof(TestStateWithDataContractNoName));
-    }
-
-    /// <summary>
-    /// Tests that GetStateName works with the State generic type.
+    /// Tests that <see cref="StateHelper.GetStateName{TState}"/> returns the CLR type name for a closed generic type.
     /// </summary>
     [Fact]
     public void GetStateNameShouldReturnNameForGenericStateType()
@@ -70,19 +45,53 @@ public class StateHelperTests
     }
 
     /// <summary>
-    /// A test state class with a DataContract attribute and a custom name.
+    /// Tests that <see cref="StateHelper.GetStateName{TState}"/> returns the CLR type name when the
+    /// <see cref="DataContractAttribute"/> is present but <see cref="DataContractAttribute.Name"/> is not specified.
     /// </summary>
+    [Fact]
+    public void GetStateNameShouldReturnTypeNameWhenDataContractHasNoName()
+    {
+        // Act
+        string result = StateHelper.GetStateName<TestStateWithDataContractNoName>();
+
+        // Assert
+        result.ShouldBe(nameof(TestStateWithDataContractNoName));
+    }
+
+    /// <summary>
+    /// Tests that <see cref="StateHelper.GetStateName{TState}"/> returns the CLR type name when no
+    /// <see cref="DataContractAttribute"/> is present.
+    /// </summary>
+    [Fact]
+    public void GetStateNameShouldReturnTypeNameWhenNoDataContractAttribute()
+    {
+        // Act
+        string result = StateHelper.GetStateName<TestStateWithoutDataContract>();
+
+        // Assert
+        result.ShouldBe(nameof(TestStateWithoutDataContract));
+    }
+
+    /// <summary>
+    /// Test state with a <see cref="DataContractAttribute"/> specifying a custom serialization name.
+    /// </summary>
+    /// <param name="Etag">The entity tag used for concurrency control.</param>
+    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
     [DataContract(Name = "CustomStateName")]
     private record TestStateWithDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 
     /// <summary>
-    /// A test state class without a DataContract attribute.
+    /// Test state without a <see cref="DataContractAttribute"/>.
     /// </summary>
+    /// <param name="Etag">The entity tag used for concurrency control.</param>
+    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
     private record TestStateWithoutDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 
     /// <summary>
-    /// A test state class with a DataContract attribute but no name specified.
+    /// Test state with a <see cref="DataContractAttribute"/> but without a custom name.
     /// </summary>
+    /// <param name="Etag">The entity tag used for concurrency control.</param>
+    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
     [DataContract]
     private record TestStateWithDataContractNoName(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 }

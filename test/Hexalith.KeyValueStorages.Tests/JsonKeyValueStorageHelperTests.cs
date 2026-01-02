@@ -34,12 +34,56 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     }
 
     /// <summary>
-    /// Disposes the test resources.
+    /// Tests that the registered provider can create a store instance.
     /// </summary>
-    public void Dispose()
+    [Fact]
+    public void AddJsonFileKeyValueStoreProviderShouldCreateStore()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        // Arrange
+        var services = new ServiceCollection();
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
+        {
+            opt.StorageRootPath = _testDirectory;
+            opt.DefaultDatabase = "testdb";
+            opt.DefaultContainer = "testcontainer";
+        });
+        _ = services.AddJsonFileKeyValueStore("test-store");
+        ServiceProvider provider = services.BuildServiceProvider();
+        IKeyValueProvider? keyValueProvider = provider.GetKeyedService<IKeyValueProvider>("test-store");
+
+        // Act
+        IKeyValueStore<string, State<DummyValue>> store = keyValueProvider!.Create<string, State<DummyValue>>();
+
+        // Assert
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<JsonFileKeyValueStore<string, State<DummyValue>>>();
+    }
+
+    /// <summary>
+    /// Tests that multiple stores can be registered with different names.
+    /// </summary>
+    [Fact]
+    public void AddJsonFileKeyValueStoreShouldAllowMultipleRegistrations()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
+        {
+            opt.StorageRootPath = _testDirectory;
+            opt.DefaultDatabase = "testdb";
+            opt.DefaultContainer = "testcontainer";
+        });
+
+        // Act
+        _ = services.AddJsonFileKeyValueStore("store1");
+        _ = services.AddJsonFileKeyValueStore("store2");
+
+        // Assert
+        ServiceProvider provider = services.BuildServiceProvider();
+        IKeyValueProvider? store1 = provider.GetKeyedService<IKeyValueProvider>("store1");
+        IKeyValueProvider? store2 = provider.GetKeyedService<IKeyValueProvider>("store2");
+        _ = store1.ShouldNotBeNull();
+        _ = store2.ShouldNotBeNull();
     }
 
     /// <summary>
@@ -50,7 +94,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     {
         // Arrange
         var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
             opt.DefaultDatabase = "testdb";
@@ -58,88 +102,13 @@ public class JsonKeyValueStorageHelperTests : IDisposable
         });
 
         // Act
-        services.AddJsonFileKeyValueStore("test-store");
+        _ = services.AddJsonFileKeyValueStore("test-store");
 
         // Assert
         ServiceProvider provider = services.BuildServiceProvider();
-        var store = provider.GetKeyedService<IKeyValueProvider>("test-store");
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<JsonFileKeyValueProvider>();
-    }
-
-    /// <summary>
-    /// Tests that AddJsonFileKeyValueStore with custom parameters works.
-    /// </summary>
-    [Fact]
-    public void AddJsonFileKeyValueStoreShouldUseCustomParameters()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
-        {
-            opt.StorageRootPath = _testDirectory;
-            opt.DefaultDatabase = "defaultdb";
-            opt.DefaultContainer = "defaultcontainer";
-        });
-
-        // Act
-        services.AddJsonFileKeyValueStore("test-store", "customdb", "customcontainer", "customentity");
-
-        // Assert
-        ServiceProvider provider = services.BuildServiceProvider();
-        var store = provider.GetKeyedService<IKeyValueProvider>("test-store");
-        store.ShouldNotBeNull();
-    }
-
-    /// <summary>
-    /// Tests that AddJsonFileKeyValueStore with JsonSerializerOptions works.
-    /// </summary>
-    [Fact]
-    public void AddJsonFileKeyValueStoreShouldUseCustomJsonSerializerOptions()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
-        {
-            opt.StorageRootPath = _testDirectory;
-            opt.DefaultDatabase = "testdb";
-            opt.DefaultContainer = "testcontainer";
-        });
-        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-        // Act
-        services.AddJsonFileKeyValueStore("test-store", options: options);
-
-        // Assert
-        ServiceProvider provider = services.BuildServiceProvider();
-        var store = provider.GetKeyedService<IKeyValueProvider>("test-store");
-        store.ShouldNotBeNull();
-    }
-
-    /// <summary>
-    /// Tests that AddJsonFileKeyValueStore throws when services is null.
-    /// </summary>
-    [Fact]
-    public void AddJsonFileKeyValueStoreShouldThrowWhenServicesIsNull()
-    {
-        // Arrange
-        IServiceCollection? services = null;
-
-        // Act & Assert
-        _ = Should.Throw<ArgumentNullException>(() => services!.AddJsonFileKeyValueStore("test"));
-    }
-
-    /// <summary>
-    /// Tests that AddJsonFileKeyValueStore throws when name is null.
-    /// </summary>
-    [Fact]
-    public void AddJsonFileKeyValueStoreShouldThrowWhenNameIsNull()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-
-        // Act & Assert
-        _ = Should.Throw<ArgumentException>(() => services.AddJsonFileKeyValueStore(null!));
+        IKeyValueProvider? store = provider.GetKeyedService<IKeyValueProvider>("test-store");
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<JsonFileKeyValueProvider>();
     }
 
     /// <summary>
@@ -156,6 +125,81 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     }
 
     /// <summary>
+    /// Tests that AddJsonFileKeyValueStore throws when name is null.
+    /// </summary>
+    [Fact]
+    public void AddJsonFileKeyValueStoreShouldThrowWhenNameIsNull()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act & Assert
+        _ = Should.Throw<ArgumentException>(() => services.AddJsonFileKeyValueStore(null!));
+    }
+
+    /// <summary>
+    /// Tests that AddJsonFileKeyValueStore throws when services is null.
+    /// </summary>
+    [Fact]
+    public void AddJsonFileKeyValueStoreShouldThrowWhenServicesIsNull()
+    {
+        // Arrange
+        IServiceCollection? services = null;
+
+        // Act & Assert
+        _ = Should.Throw<ArgumentNullException>(() => services!.AddJsonFileKeyValueStore("test"));
+    }
+
+    /// <summary>
+    /// Tests that AddJsonFileKeyValueStore with JsonSerializerOptions works.
+    /// </summary>
+    [Fact]
+    public void AddJsonFileKeyValueStoreShouldUseCustomJsonSerializerOptions()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
+        {
+            opt.StorageRootPath = _testDirectory;
+            opt.DefaultDatabase = "testdb";
+            opt.DefaultContainer = "testcontainer";
+        });
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        // Act
+        _ = services.AddJsonFileKeyValueStore("test-store", options: options);
+
+        // Assert
+        ServiceProvider provider = services.BuildServiceProvider();
+        IKeyValueProvider? store = provider.GetKeyedService<IKeyValueProvider>("test-store");
+        _ = store.ShouldNotBeNull();
+    }
+
+    /// <summary>
+    /// Tests that AddJsonFileKeyValueStore with custom parameters works.
+    /// </summary>
+    [Fact]
+    public void AddJsonFileKeyValueStoreShouldUseCustomParameters()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
+        {
+            opt.StorageRootPath = _testDirectory;
+            opt.DefaultDatabase = "defaultdb";
+            opt.DefaultContainer = "defaultcontainer";
+        });
+
+        // Act
+        _ = services.AddJsonFileKeyValueStore("test-store", "customdb", "customcontainer", "customentity");
+
+        // Assert
+        ServiceProvider provider = services.BuildServiceProvider();
+        IKeyValueProvider? store = provider.GetKeyedService<IKeyValueProvider>("test-store");
+        _ = store.ShouldNotBeNull();
+    }
+
+    /// <summary>
     /// Tests that AddPolymorphicJsonFileKeyValueStore registers the service correctly.
     /// </summary>
     [Fact]
@@ -163,7 +207,7 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     {
         // Arrange
         var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
+        _ = services.Configure<KeyValueStoreSettings>(opt =>
         {
             opt.StorageRootPath = _testDirectory;
             opt.DefaultDatabase = "testdb";
@@ -171,26 +215,13 @@ public class JsonKeyValueStorageHelperTests : IDisposable
         });
 
         // Act
-        services.AddPolymorphicJsonFileKeyValueStore("test-store");
+        _ = services.AddPolymorphicJsonFileKeyValueStore("test-store");
 
         // Assert
         ServiceProvider provider = services.BuildServiceProvider();
-        var store = provider.GetKeyedService<IKeyValueProvider>("test-store");
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<JsonFileKeyValueProvider>();
-    }
-
-    /// <summary>
-    /// Tests that AddPolymorphicJsonFileKeyValueStore throws when services is null.
-    /// </summary>
-    [Fact]
-    public void AddPolymorphicJsonFileKeyValueStoreShouldThrowWhenServicesIsNull()
-    {
-        // Arrange
-        IServiceCollection? services = null;
-
-        // Act & Assert
-        _ = Should.Throw<ArgumentNullException>(() => services!.AddPolymorphicJsonFileKeyValueStore("test"));
+        IKeyValueProvider? store = provider.GetKeyedService<IKeyValueProvider>("test-store");
+        _ = store.ShouldNotBeNull();
+        _ = store.ShouldBeOfType<JsonFileKeyValueProvider>();
     }
 
     /// <summary>
@@ -207,56 +238,25 @@ public class JsonKeyValueStorageHelperTests : IDisposable
     }
 
     /// <summary>
-    /// Tests that multiple stores can be registered with different names.
+    /// Tests that AddPolymorphicJsonFileKeyValueStore throws when services is null.
     /// </summary>
     [Fact]
-    public void AddJsonFileKeyValueStoreShouldAllowMultipleRegistrations()
+    public void AddPolymorphicJsonFileKeyValueStoreShouldThrowWhenServicesIsNull()
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
-        {
-            opt.StorageRootPath = _testDirectory;
-            opt.DefaultDatabase = "testdb";
-            opt.DefaultContainer = "testcontainer";
-        });
+        IServiceCollection? services = null;
 
-        // Act
-        services.AddJsonFileKeyValueStore("store1");
-        services.AddJsonFileKeyValueStore("store2");
-
-        // Assert
-        ServiceProvider provider = services.BuildServiceProvider();
-        var store1 = provider.GetKeyedService<IKeyValueProvider>("store1");
-        var store2 = provider.GetKeyedService<IKeyValueProvider>("store2");
-        store1.ShouldNotBeNull();
-        store2.ShouldNotBeNull();
+        // Act & Assert
+        _ = Should.Throw<ArgumentNullException>(() => services!.AddPolymorphicJsonFileKeyValueStore("test"));
     }
 
     /// <summary>
-    /// Tests that the registered provider can create a store instance.
+    /// Disposes the test resources.
     /// </summary>
-    [Fact]
-    public void AddJsonFileKeyValueStoreProviderShouldCreateStore()
+    public void Dispose()
     {
-        // Arrange
-        var services = new ServiceCollection();
-        services.Configure<KeyValueStoreSettings>(opt =>
-        {
-            opt.StorageRootPath = _testDirectory;
-            opt.DefaultDatabase = "testdb";
-            opt.DefaultContainer = "testcontainer";
-        });
-        services.AddJsonFileKeyValueStore("test-store");
-        ServiceProvider provider = services.BuildServiceProvider();
-        var keyValueProvider = provider.GetKeyedService<IKeyValueProvider>("test-store");
-
-        // Act
-        var store = keyValueProvider!.Create<string, State<DummyValue>>();
-
-        // Assert
-        store.ShouldNotBeNull();
-        store.ShouldBeOfType<JsonFileKeyValueStore<string, State<DummyValue>>>();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
