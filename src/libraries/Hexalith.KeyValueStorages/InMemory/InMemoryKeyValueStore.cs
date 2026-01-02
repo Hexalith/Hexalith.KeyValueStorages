@@ -97,15 +97,36 @@ public class InMemoryKeyValueStore<TKey, TState>(
     /// <inheritdoc/>
     public override Task<string> AddOrUpdateAsync(TKey key, TState value, CancellationToken cancellationToken)
     {
-        InMemoryKey<TKey> storeKey = GetKey(key);
-        if (_store.ContainsKey(storeKey))
+        ArgumentNullException.ThrowIfNull(value);
+        cancellationToken.ThrowIfCancellationRequested();
+        using (_lock.EnterScope())
         {
-            // The key already exists and has not expired
-            return SetAsync(key, value, cancellationToken);
-        }
+            InMemoryKey<TKey> storeKey = GetKey(key);
+            CheckTimeToLive(storeKey);
 
-        // The key does not exist or has expired
-        return AddAsync(key, value, cancellationToken);
+            string newEtag = UniqueIdHelper.GenerateUniqueStringId();
+            if (_store.TryGetValue(storeKey, out TState? current))
+            {
+                // Key exists - verify etag if provided
+                if (!string.IsNullOrWhiteSpace(value.Etag) && value.Etag != current.Etag)
+                {
+                    throw new ConcurrencyException<TKey>(key, value.Etag, current.Etag);
+                }
+            }
+
+            // Add or update the value
+            _store[storeKey] = value with { Etag = newEtag };
+            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            {
+                _timeToLive[storeKey] = TimeProvider.GetUtcNow().Add(value.TimeToLive.Value);
+            }
+            else
+            {
+                _ = _timeToLive.Remove(storeKey);
+            }
+
+            return Task.FromResult(newEtag);
+        }
     }
 
     /// <summary>
@@ -115,7 +136,10 @@ public class InMemoryKeyValueStore<TKey, TState>(
     {
         using (_lock.EnterScope())
         {
-            foreach (InMemoryKey<TKey>? key in _store.Keys.Where(p => p.Database == Database && p.Container == Container))
+            List<InMemoryKey<TKey>> keysToRemove = _store.Keys
+                .Where(p => p.Database == Database && p.Container == Container)
+                .ToList();
+            foreach (InMemoryKey<TKey> key in keysToRemove)
             {
                 _ = _store.Remove(key);
                 _ = _timeToLive.Remove(key);
@@ -152,12 +176,8 @@ public class InMemoryKeyValueStore<TKey, TState>(
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
-            if (_store.ContainsKey(storeKey))
-            {
-                return Task.FromResult(true);
-            }
-
-            return Task.FromResult(false);
+            CheckTimeToLive(storeKey);
+            return Task.FromResult(_store.ContainsKey(storeKey));
         }
     }
 
@@ -197,6 +217,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
                 throw new ConcurrencyException<TKey>(key, etag, current.Etag);
             }
 
+            _ = _timeToLive.Remove(storeKey);
             return Task.FromResult(_store.Remove(storeKey));
         }
     }
@@ -243,9 +264,11 @@ public class InMemoryKeyValueStore<TKey, TState>(
         using (_lock.EnterScope())
         {
             DateTimeOffset now = TimeProvider.GetUtcNow();
-            foreach (InMemoryKey<TKey>? key in _timeToLive
+            List<InMemoryKey<TKey>> expiredKeys = _timeToLive
                 .Where(p => p.Value < now)
-                .Select(p => p.Key))
+                .Select(p => p.Key)
+                .ToList();
+            foreach (InMemoryKey<TKey> key in expiredKeys)
             {
                 // The key exists and has expired
                 _ = _store.Remove(key);
@@ -255,21 +278,16 @@ public class InMemoryKeyValueStore<TKey, TState>(
     }
 
     /// <inheritdoc/>
-    public override async Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
+    public override Task<TState?> TryGetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        TState? result = null;
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
             CheckTimeToLive(storeKey);
-            if (_store.TryGetValue(storeKey, out TState? value))
-            {
-                result = value;
-            }
+            _ = _store.TryGetValue(storeKey, out TState? value);
+            return Task.FromResult(value);
         }
-
-        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     private void CheckTimeToLive(InMemoryKey<TKey> storeKey)

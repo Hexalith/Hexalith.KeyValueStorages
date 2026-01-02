@@ -15,7 +15,7 @@ public interface IState
     /// <summary>
     /// Gets the name of the state.
     /// </summary>
-    static abstract IState Name { get; }
+    static abstract string Name { get; }
 
     /// <summary>
     /// Gets the etag of the state.

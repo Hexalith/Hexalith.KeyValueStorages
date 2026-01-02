@@ -14,7 +14,6 @@ using Hexalith.Commons.Configurations;
 using Hexalith.Commons.UniqueIds;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Exceptions;
-using Hexalith.KeyValueStorages.Helpers;
 
 using Microsoft.Extensions.Options;
 
@@ -44,7 +43,7 @@ public abstract class FileKeyValueStorage<TKey, TState>
         string? container = null,
         string? entity = null,
         TimeProvider? timeProvider = null)
-        : base(settings, database, container, GetEntity(entity), timeProvider)
+        : base(settings, database, container, entity, timeProvider)
     {
         SettingsException.ThrowIfUndefined<KeyValueStoreSettings>(settings?.Value.StorageRootPath);
         _rootPath = settings.Value.StorageRootPath;
@@ -238,16 +237,6 @@ public abstract class FileKeyValueStorage<TKey, TState>
         await using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         await WriteToStreamAsync(stream, value, cancellationToken).ConfigureAwait(false);
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    private static string GetEntity(string? entity)
-    {
-        if (string.IsNullOrWhiteSpace(entity))
-        {
-            return StateHelper.GetStateName<TState>();
-        }
-
-        return entity;
     }
 
     private async Task<TState?> ReadAsync(string filePath, CancellationToken cancellationToken)
