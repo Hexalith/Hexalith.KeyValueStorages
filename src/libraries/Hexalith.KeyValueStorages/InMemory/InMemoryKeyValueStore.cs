@@ -105,13 +105,9 @@ public class InMemoryKeyValueStore<TKey, TState>(
             CheckTimeToLive(storeKey);
 
             string newEtag = UniqueIdHelper.GenerateUniqueStringId();
-            if (_store.TryGetValue(storeKey, out TState? current))
+            if (_store.TryGetValue(storeKey, out TState? current) && !string.IsNullOrWhiteSpace(value.Etag) && value.Etag != current.Etag)
             {
-                // Key exists - verify etag if provided
-                if (!string.IsNullOrWhiteSpace(value.Etag) && value.Etag != current.Etag)
-                {
-                    throw new ConcurrencyException<TKey>(key, value.Etag, current.Etag);
-                }
+                throw new ConcurrencyException<TKey>(key, value.Etag, current.Etag);
             }
 
             // Add or update the value
@@ -136,7 +132,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     {
         using (_lock.EnterScope())
         {
-            List<InMemoryKey<TKey>> keysToRemove = _store.Keys
+            var keysToRemove = _store.Keys
                 .Where(p => p.Database == Database && p.Container == Container)
                 .ToList();
             foreach (InMemoryKey<TKey> key in keysToRemove)
@@ -264,7 +260,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
         using (_lock.EnterScope())
         {
             DateTimeOffset now = TimeProvider.GetUtcNow();
-            List<InMemoryKey<TKey>> expiredKeys = _timeToLive
+            var expiredKeys = _timeToLive
                 .Where(p => p.Value < now)
                 .Select(p => p.Key)
                 .ToList();
