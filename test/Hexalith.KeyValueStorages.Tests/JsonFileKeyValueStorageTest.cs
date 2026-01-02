@@ -413,6 +413,138 @@ public class JsonFileKeyValueStorageTest : IDisposable
     }
 
     /// <summary>
+    /// Tests the ExistsAsync method returns true when file exists.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    [Fact]
+    public async Task ExistsAsyncShouldReturnTrueWhenFileExists()
+    {
+        // Arrange
+        var dummyValue = new DummyValue
+        {
+            Name = "Test",
+            Started = DateTimeOffset.UtcNow,
+            Retries = 0,
+            Failed = false,
+        };
+        var state = new State<DummyValue>(dummyValue, null, null);
+        _ = await _storage.AddAsync("key1", state, CancellationToken.None);
+
+        // Act
+        bool result = await _storage.ExistsAsync("key1", CancellationToken.None);
+
+        // Assert
+        result.ShouldBeTrue();
+    }
+
+    /// <summary>
+    /// Tests the ExistsAsync method returns false when file doesn't exist.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    [Fact]
+    public async Task ExistsAsyncShouldReturnFalseWhenFileDoesNotExist()
+    {
+        // Act
+        bool result = await _storage.ExistsAsync("nonexistent", CancellationToken.None);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    /// <summary>
+    /// Tests the AddOrUpdateAsync method adds a new value when key doesn't exist.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    [Fact]
+    public async Task AddOrUpdateAsyncShouldAddValueWhenKeyDoesNotExist()
+    {
+        // Arrange
+        var dummyValue = new DummyValue
+        {
+            Name = "Test",
+            Started = DateTimeOffset.UtcNow,
+            Retries = 0,
+            Failed = false,
+        };
+        var state = new State<DummyValue>(dummyValue, null, null);
+
+        // Act
+        string result = await _storage.AddOrUpdateAsync("key1", state, CancellationToken.None);
+
+        // Assert
+        result.ShouldNotBeNullOrWhiteSpace();
+        State<DummyValue> stored = await _storage.GetAsync("key1", CancellationToken.None);
+        stored.Value.Name.ShouldBe("Test");
+    }
+
+    /// <summary>
+    /// Tests the AddOrUpdateAsync method updates an existing value when key exists.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    [Fact]
+    public async Task AddOrUpdateAsyncShouldUpdateValueWhenKeyExists()
+    {
+        // Arrange
+        var dummyValue = new DummyValue
+        {
+            Name = "Original",
+            Started = DateTimeOffset.UtcNow,
+            Retries = 0,
+            Failed = false,
+        };
+        var state = new State<DummyValue>(dummyValue, null, null);
+        string etag = await _storage.AddAsync("key1", state, CancellationToken.None);
+
+        var updatedValue = new DummyValue
+        {
+            Name = "Updated",
+            Started = DateTimeOffset.UtcNow,
+            Retries = 5,
+            Failed = true,
+        };
+
+        // Act
+        string result = await _storage.AddOrUpdateAsync("key1", new State<DummyValue>(updatedValue, etag, null), CancellationToken.None);
+
+        // Assert
+        result.ShouldNotBeNullOrWhiteSpace();
+        result.ShouldNotBe(etag);
+        State<DummyValue> stored = await _storage.GetAsync("key1", CancellationToken.None);
+        stored.Value.Name.ShouldBe("Updated");
+        stored.Value.Retries.ShouldBe(5);
+        stored.Value.Failed.ShouldBeTrue();
+    }
+
+    /// <summary>
+    /// Tests the GetDirectoryPath method returns the expected path.
+    /// </summary>
+    [Fact]
+    public void GetDirectoryPathShouldReturnExpectedPath()
+    {
+        // Act
+        string result = _storage.GetDirectoryPath();
+
+        // Assert
+        result.ShouldContain(_testDirectory);
+        result.ShouldContain("TestDatabase");
+        result.ShouldContain("DummyValues");
+    }
+
+    /// <summary>
+    /// Tests the GetFilePath method returns the expected path.
+    /// </summary>
+    [Fact]
+    public void GetFilePathShouldReturnExpectedPath()
+    {
+        // Act
+        string result = _storage.GetFilePath("testkey");
+
+        // Assert
+        result.ShouldContain("testkey.json");
+        result.ShouldContain(_testDirectory);
+    }
+
+    /// <summary>
     /// Disposes the test resources.
     /// </summary>
     /// <param name="disposing">Whether the method is being called from Dispose().</param>
