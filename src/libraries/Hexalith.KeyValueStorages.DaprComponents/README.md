@@ -1,204 +1,377 @@
 # Hexalith.KeyValueStorages.DaprComponents
 
-This library provides a Dapr actor-based implementation of the key-value storage interface. It uses Dapr actors to ensure concurrency control and data consistency.
+## Overview
+
+Hexalith.KeyValueStorages.DaprComponents provides a distributed key-value storage implementation using [Dapr Actors](https://docs.dapr.io/developing-applications/building-blocks/actors/). It leverages Dapr's actor model to ensure single-threaded access per key, providing strong consistency guarantees in distributed environments.
 
 ## Features
 
-- Thread-safe key-value storage using Dapr actors
-- Automatic concurrency control with etags
-- Serialization support for keys and values
-- Easy integration with ASP.NET Core and Dapr applications
+- **Distributed Storage**: State replicated across Dapr sidecars
+- **Single-Threaded Access**: Actor model ensures one operation per key at a time
+- **Automatic Concurrency**: No manual locking required
+- **Scalable**: Actors distributed across cluster nodes
+- **Persistent State**: Backed by configurable Dapr state stores
+- **ETag Support**: Optimistic concurrency control
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- .NET 8.0 or later
+- [Dapr runtime](https://docs.dapr.io/getting-started/) installed and configured
+- Dapr state store component configured
 
-- .NET 9.0 or later
-- Dapr runtime installed and configured
-
-### Installation
-
-Add the package to your project:
+## Installation
 
 ```bash
 dotnet add package Hexalith.KeyValueStorages.DaprComponents
 ```
 
-### Usage
+## Quick Start
 
-#### 1. Register the actor and key-value storage in your ASP.NET Core application
+### 1. Define Your State
 
 ```csharp
-using Hexalith.KeyValueStorages;
-using Hexalith.KeyValueStorages.DaprComponents.Extensions;
+using Hexalith.KeyValueStorages.Abstractions;
+
+public record CartState : StateBase
+{
+    public static string Name => "Cart";
+
+    public string UserId { get; init; } = string.Empty;
+    public List<CartItem> Items { get; init; } = [];
+    public decimal Total { get; init; }
+}
+
+public record CartItem
+{
+    public string ProductId { get; init; } = string.Empty;
+    public int Quantity { get; init; }
+    public decimal Price { get; init; }
+}
+```
+
+### 2. Configure ASP.NET Core Application
+
+```csharp
+using Hexalith.KeyValueStorages.DaprComponents;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register the Dapr actor key-value storage
-builder.Services.AddDaprActorKeyValueStorage<string, MyData, KeyToStringSerializer<string>, MyDataSerializer>();
+// Add Dapr actor services
+builder.Services.AddActors(options =>
+{
+    options.Actors.RegisterActor<KeyValueStoreActor<CartState>>();
+});
+
+// Register the Dapr key-value store
+builder.Services.AddSingleton<IKeyValueStore<string, CartState>>(sp =>
+{
+    return new DaprActorKeyValueStore<string, CartState>(
+        keyToActorId: key => $"cart-{key}");
+});
 
 var app = builder.Build();
 
-// Configure the Dapr actors middleware
+// Configure Dapr actors endpoint
 app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapActorsHandlers();
-});
+app.MapActorsHandlers();
 
 app.Run();
 ```
 
-#### 2. Create a value serializer
+### 3. Use the Store
 
 ```csharp
-using System.Text.Json;
-using Hexalith.KeyValueStorages;
-
-public class MyDataSerializer : IValueSerializer<MyData, string>
+public class CartService
 {
-    public string DataType => "application/json";
+    private readonly IKeyValueStore<string, CartState> _store;
 
-    public (MyData Value, string Etag) Deserialize(string value)
+    public CartService(IKeyValueStore<string, CartState> store)
     {
-        var document = JsonDocument.Parse(value);
-        var root = document.RootElement;
-        
-        string etag = root.GetProperty("etag").GetString() ?? throw new InvalidOperationException("Etag is missing");
-        MyData data = JsonSerializer.Deserialize<MyData>(root.GetProperty("data").GetRawText()) 
-            ?? throw new InvalidOperationException("Failed to deserialize data");
-        
-        return (data, etag);
+        _store = store;
     }
 
-    public async Task<(MyData Value, string Etag)> DeserializeAsync(Stream stream, CancellationToken cancellationToken)
+    public async Task<CartState> GetOrCreateCartAsync(
+        string userId,
+        CancellationToken cancellationToken)
     {
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-        var root = document.RootElement;
-        
-        string etag = root.GetProperty("etag").GetString() ?? throw new InvalidOperationException("Etag is missing");
-        MyData data = JsonSerializer.Deserialize<MyData>(root.GetProperty("data").GetRawText()) 
-            ?? throw new InvalidOperationException("Failed to deserialize data");
-        
-        return (data, etag);
+        var cart = await _store.TryGetAsync(userId, cancellationToken);
+
+        if (cart == null)
+        {
+            cart = new CartState { UserId = userId };
+            await _store.AddAsync(userId, cart, cancellationToken);
+        }
+
+        return cart;
     }
 
-    public string Serialize(MyData value, string etag)
+    public async Task AddItemAsync(
+        string userId,
+        CartItem item,
+        CancellationToken cancellationToken)
     {
-        var wrapper = new { data = value, etag };
-        return JsonSerializer.Serialize(wrapper);
-    }
+        var cart = await _store.GetAsync(userId, cancellationToken);
 
-    public async Task SerializeAsync(Stream stream, MyData value, string etag, CancellationToken cancellationToken)
-    {
-        var wrapper = new { data = value, etag };
-        await JsonSerializer.SerializeAsync(stream, wrapper, cancellationToken: cancellationToken);
-    }
-}
-```
+        var updated = cart with
+        {
+            Items = [.. cart.Items, item],
+            Total = cart.Total + (item.Price * item.Quantity)
+        };
 
-#### 3. Use the key-value storage in your application
-
-```csharp
-public class MyService
-{
-    private readonly IKeyValueStore<string, MyData, string> _storage;
-
-    public MyService(IKeyValueStore<string, MyData, string> storage)
-    {
-        _storage = storage;
-    }
-
-    public async Task SaveDataAsync(string key, MyData data, CancellationToken cancellationToken)
-    {
-        // Add new data
-        string etag = await _storage.AddAsync(key, data, cancellationToken);
-        
-        // Update existing data
-        data.UpdatedAt = DateTime.UtcNow;
-        string newEtag = await _storage.SetAsync(key, data, etag, cancellationToken);
-        
-        // Get data
-        StoreResult<MyData, string> result = await _storage.GetAsync(key, cancellationToken);
-        Console.WriteLine($"Data: {result.Value}, Etag: {result.Etag}");
+        await _store.SetAsync(userId, updated, cancellationToken);
     }
 }
 ```
 
 ## How It Works
 
-The Dapr actor-based key-value storage uses Dapr actors to ensure that only one operation can be performed on a key at a time. This prevents race conditions and ensures data consistency.
+### Actor Per Key
 
-1. Each key-value pair is stored in the actor's state
-2. The actor handles concurrency control using etags
-3. The actor ensures that only one operation can be performed on a key at a time
+Each key maps to a dedicated actor instance:
+
+```
+Key "user-123" → Actor "cart-user-123"
+Key "user-456" → Actor "cart-user-456"
+```
+
+### Single-Threaded Execution
+
+Dapr actors process one request at a time per actor, eliminating race conditions:
+
+```
+Request 1 (user-123) ─┬─→ Actor "cart-user-123" → Sequential execution
+Request 2 (user-123) ─┘
+
+Request 3 (user-456) ───→ Actor "cart-user-456" → Parallel with above
+```
+
+### State Persistence
+
+Actor state is persisted to the configured Dapr state store (Redis, CosmosDB, etc.):
+
+```yaml
+# components/statestore.yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      value: localhost:6379
+```
 
 ## Configuration
 
-You can configure the actor settings when registering the key-value storage:
+### Actor Registration
 
 ```csharp
-builder.Services.AddDaprActorKeyValueStorage<string, MyData, KeyToStringSerializer<string>, MyDataSerializer>(
-    actorTypeName: "CustomKeyValueStoreActor");
+builder.Services.AddActors(options =>
+{
+    // Register the actor type
+    options.Actors.RegisterActor<KeyValueStoreActor<CartState>>();
+
+    // Configure actor options
+    options.ActorIdleTimeout = TimeSpan.FromMinutes(10);
+    options.DrainOngoingCallTimeout = TimeSpan.FromSeconds(30);
+    options.DrainRebalancedActors = true;
+});
 ```
+
+### Custom Actor ID Generation
+
+```csharp
+// Simple prefix
+var store = new DaprActorKeyValueStore<string, CartState>(
+    keyToActorId: key => $"cart-{key}");
+
+// Composite key
+var store = new DaprActorKeyValueStore<(string TenantId, string UserId), CartState>(
+    keyToActorId: key => $"{key.TenantId}-{key.UserId}");
+
+// Hashed for long keys
+var store = new DaprActorKeyValueStore<string, CartState>(
+    keyToActorId: key => Convert.ToBase64String(
+        SHA256.HashData(Encoding.UTF8.GetBytes(key))));
+```
+
+## DaprActorKeyValueStore API
+
+### Constructor
+
+```csharp
+public DaprActorKeyValueStore(
+    Func<TKey, string> keyToActorId,
+    string? actorType = null,
+    KeyValueStorageSettings? settings = null)
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `keyToActorId` | Function to convert key to actor ID |
+| `actorType` | Actor type name (defaults to `KeyValueStoreActor_{StateName}`) |
+| `settings` | Optional settings for database/container |
+
+### Methods
+
+Same interface as other implementations:
+
+| Method | Description |
+|--------|-------------|
+| `AddAsync` | Add new value via actor |
+| `AddOrUpdateAsync` | Add or update via actor |
+| `SetAsync` | Update existing value |
+| `GetAsync` | Get value from actor state |
+| `TryGetAsync` | Try to get value |
+| `ContainsKeyAsync` | Check if key exists |
+| `RemoveAsync` | Remove value from actor |
 
 ## Advanced Usage
 
-### Custom Actor Type Name
-
-You can specify a custom actor type name when registering the key-value storage:
+### Multiple State Types
 
 ```csharp
-builder.Services.AddDaprActorKeyValueStorage<string, MyData, KeyToStringSerializer<string>, MyDataSerializer>(
-    actorTypeName: "CustomKeyValueStoreActor");
+builder.Services.AddActors(options =>
+{
+    options.Actors.RegisterActor<KeyValueStoreActor<CartState>>();
+    options.Actors.RegisterActor<KeyValueStoreActor<SessionState>>();
+    options.Actors.RegisterActor<KeyValueStoreActor<PreferenceState>>();
+});
+
+builder.Services.AddSingleton<IKeyValueStore<string, CartState>>(sp =>
+    new DaprActorKeyValueStore<string, CartState>(key => $"cart-{key}"));
+
+builder.Services.AddSingleton<IKeyValueStore<string, SessionState>>(sp =>
+    new DaprActorKeyValueStore<string, SessionState>(key => $"session-{key}"));
 ```
 
-### Custom Key Serializer
-
-You can create a custom key serializer by implementing the `IKeySerializer<TKey>` interface:
+### With Dependency Injection Provider
 
 ```csharp
-public class CustomKeySerializer<TKey> : IKeySerializer<TKey>
-    where TKey : notnull
+builder.Services.AddSingleton<IKeyValueProvider, DaprActorKeyValueProvider>();
+
+// Usage
+public class MyService
 {
-    public string Serialize(TKey key)
+    private readonly IKeyValueStore<string, CartState> _cartStore;
+    private readonly IKeyValueStore<string, SessionState> _sessionStore;
+
+    public MyService(IKeyValueProvider provider)
     {
-        // Custom serialization logic
-        return key.ToString() ?? throw new InvalidOperationException("Key cannot be null");
+        _cartStore = provider.Create<string, CartState>("app", "carts", "cart");
+        _sessionStore = provider.Create<string, SessionState>("app", "sessions", "session");
     }
 }
 ```
 
-### Custom Value Serializer
-
-You can create a custom value serializer by implementing the `IValueSerializer<TValue, TEtag>` interface:
+### Custom Actor Implementation
 
 ```csharp
-public class CustomValueSerializer<TValue> : IValueSerializer<TValue, string>
+public class CustomKeyValueActor : KeyValueStoreActor<CartState>
 {
-    public string DataType => "application/custom";
+    private readonly ILogger<CustomKeyValueActor> _logger;
 
-    public (TValue Value, string Etag) Deserialize(string value)
+    public CustomKeyValueActor(
+        ActorHost host,
+        ILogger<CustomKeyValueActor> logger)
+        : base(host)
     {
-        // Custom deserialization logic
-        // ...
+        _logger = logger;
     }
 
-    public Task<(TValue Value, string Etag)> DeserializeAsync(Stream stream, CancellationToken cancellationToken)
+    public override async Task<string> AddAsync(CartState value)
     {
-        // Custom async deserialization logic
-        // ...
-    }
-
-    public string Serialize(TValue value, string etag)
-    {
-        // Custom serialization logic
-        // ...
-    }
-
-    public Task SerializeAsync(Stream stream, TValue value, string etag, CancellationToken cancellationToken)
-    {
-        // Custom async serialization logic
-        // ...
+        _logger.LogInformation("Adding cart for {ActorId}", Id);
+        return await base.AddAsync(value);
     }
 }
+```
+
+## Error Handling
+
+```csharp
+try
+{
+    await store.SetAsync(userId, cart, cancellationToken);
+}
+catch (ConcurrencyException<string> ex)
+{
+    // Another request modified the cart
+    _logger.LogWarning("Concurrency conflict on cart {Key}", ex.Key);
+
+    // Reload and retry
+    var current = await store.GetAsync(userId, cancellationToken);
+    // Merge changes and retry...
+}
+catch (ActorInvokeException ex)
+{
+    // Dapr actor invocation failed
+    _logger.LogError(ex, "Actor invocation failed");
+    throw;
+}
+```
+
+## Best Practices
+
+1. **Keep Actor State Small**: Large state increases serialization overhead
+2. **Use Meaningful Actor IDs**: Include context for debugging
+3. **Handle Actor Timeouts**: Configure appropriate timeouts for your workload
+4. **Monitor Actor Placement**: Use Dapr dashboard for actor distribution
+5. **Plan for State Migration**: Consider versioning for state schema changes
+
+## Performance Considerations
+
+- **Actor Activation**: First request to an actor incurs activation cost
+- **State Serialization**: JSON serialization for each state access
+- **Network Latency**: Actor calls go through Dapr sidecar
+- **Idle Timeout**: Configure based on access patterns
+
+## Dapr Configuration
+
+### State Store Component
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      value: redis:6379
+    - name: actorStateStore
+      value: "true"
+```
+
+### Actor Runtime Configuration
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: daprConfig
+spec:
+  features:
+    - name: Actor.TypeMetadata
+      enabled: true
+  actor:
+    drainOngoingCallTimeout: 30s
+    drainRebalancedActors: true
+    idleTimeout: 1h
+    reentrancy:
+      enabled: false
+```
+
+## Related Packages
+
+- [Hexalith.KeyValueStorages.Abstractions](../Hexalith.KeyValueStorages.Abstractions/README.md) - Core interfaces
+- [Hexalith.KeyValueStorages](../Hexalith.KeyValueStorages/README.md) - In-memory implementation
+- [Hexalith.KeyValueStorages.Files](../Hexalith.KeyValueStorages.Files/README.md) - File-based storage
+
+## License
+
+This project is licensed under the MIT License.
