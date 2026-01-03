@@ -69,12 +69,7 @@ public class RedisKeyValueStore<TKey, TState>(
         // Use SetAsync with When.NotExists to prevent race conditions
         bool success = await db.StringSetAsync(redisKey, serializedValue, expiry, when: When.NotExists).ConfigureAwait(false);
 
-        if (!success)
-        {
-            throw new DuplicateKeyException<TKey>(key);
-        }
-
-        return etag;
+        return !success ? throw new DuplicateKeyException<TKey>(key) : etag;
     }
 
     /// <inheritdoc/>
@@ -92,7 +87,7 @@ public class RedisKeyValueStore<TKey, TState>(
             RedisValue existingValue = await db.StringGetAsync(redisKey).ConfigureAwait(false);
             if (existingValue.HasValue)
             {
-                TState? currentState = JsonSerializer.Deserialize<TState>(existingValue!, _jsonSerializerOptions);
+                TState? currentState = JsonSerializer.Deserialize<TState>(existingValue.ToString(), _jsonSerializerOptions);
                 if (currentState != null && !string.IsNullOrWhiteSpace(currentState.Etag) && value.Etag != currentState.Etag)
                 {
                     throw new ConcurrencyException<TKey>(key, value.Etag, currentState.Etag);
@@ -104,8 +99,7 @@ public class RedisKeyValueStore<TKey, TState>(
         TState stateWithEtag = value with { Etag = newEtag };
         string serializedValue = JsonSerializer.Serialize(stateWithEtag, _jsonSerializerOptions);
 
-        TimeSpan? expiry = value.TimeToLive > TimeSpan.Zero ? value.TimeToLive : null;
-        _ = await db.StringSetAsync(redisKey, serializedValue, expiry).ConfigureAwait(false);
+        _ = await db.StringSetAsync(redisKey, serializedValue, GetExpiration(value.TimeToLive)).ConfigureAwait(false);
 
         return newEtag;
     }
@@ -131,12 +125,9 @@ public class RedisKeyValueStore<TKey, TState>(
         string redisKey = GetRedisKey(key);
 
         RedisValue value = await db.StringGetAsync(redisKey).ConfigureAwait(false);
-        if (!value.HasValue)
-        {
-            throw new KeyNotFoundException($"Key {key} not found.");
-        }
-
-        return JsonSerializer.Deserialize<TState>(value!, _jsonSerializerOptions)
+        return !value.HasValue
+            ? throw new KeyNotFoundException($"Key {key} not found.")
+            : JsonSerializer.Deserialize<TState>(value.ToString(), _jsonSerializerOptions)
             ?? throw new InvalidOperationException($"Failed to deserialize value for key {key}.");
     }
 
@@ -156,7 +147,7 @@ public class RedisKeyValueStore<TKey, TState>(
                 return false;
             }
 
-            TState? currentState = JsonSerializer.Deserialize<TState>(existingValue!, _jsonSerializerOptions);
+            TState? currentState = JsonSerializer.Deserialize<TState>(existingValue.ToString(), _jsonSerializerOptions);
             if (currentState != null && !string.IsNullOrWhiteSpace(currentState.Etag) && etag != currentState.Etag)
             {
                 throw new ConcurrencyException<TKey>(key, etag, currentState.Etag);
@@ -182,7 +173,7 @@ public class RedisKeyValueStore<TKey, TState>(
             throw new KeyNotFoundException($"Key {key} not found.");
         }
 
-        TState? currentState = JsonSerializer.Deserialize<TState>(existingValue!, _jsonSerializerOptions);
+        TState? currentState = JsonSerializer.Deserialize<TState>(existingValue.ToString(), _jsonSerializerOptions);
         if (!string.IsNullOrWhiteSpace(value.Etag) && currentState != null && value.Etag != currentState.Etag)
         {
             throw new ConcurrencyException<TKey>(key, value.Etag, currentState.Etag);
@@ -192,8 +183,7 @@ public class RedisKeyValueStore<TKey, TState>(
         TState stateWithEtag = value with { Etag = newEtag };
         string serializedValue = JsonSerializer.Serialize(stateWithEtag, _jsonSerializerOptions);
 
-        TimeSpan? expiry = value.TimeToLive > TimeSpan.Zero ? value.TimeToLive : null;
-        _ = await db.StringSetAsync(redisKey, serializedValue, expiry).ConfigureAwait(false);
+        _ = await db.StringSetAsync(redisKey, serializedValue, GetExpiration(value.TimeToLive)).ConfigureAwait(false);
 
         return newEtag;
     }
@@ -206,12 +196,14 @@ public class RedisKeyValueStore<TKey, TState>(
         string redisKey = GetRedisKey(key);
 
         RedisValue value = await db.StringGetAsync(redisKey).ConfigureAwait(false);
-        if (!value.HasValue)
-        {
-            return null;
-        }
+        return !value.HasValue ? null : JsonSerializer.Deserialize<TState>(value.ToString(), _jsonSerializerOptions);
+    }
 
-        return JsonSerializer.Deserialize<TState>(value!, _jsonSerializerOptions);
+    private Expiration GetExpiration(TimeSpan? timeToLive)
+    {
+        return timeToLive is not null && timeToLive > TimeSpan.Zero
+            ? new Expiration(TimeProvider.GetUtcNow().Add(timeToLive.Value).DateTime)
+            : default;
     }
 
     /// <summary>

@@ -35,7 +35,7 @@ switch (settings.StorageType)
         Console.WriteLine("Using Redis storage...");
         _ = builder.Services.ConfigureSettings<RedisKeyValueStoreSettings>(builder.Configuration);
         _ = builder.Services.AddRedisConnection();
-        _ = builder.Services.AddRedisKeyValueStorage<string, StateBase>("sample");
+        _ = builder.Services.AddRedisKeyValueStorage("sample");
         break;
 
     case KeyValueStorageType.File:

@@ -17,22 +17,22 @@ public enum KeyValueStorageType
     /// <summary>
     /// In-memory storage (data is not persisted).
     /// </summary>
-    Memory,
+    Memory = 0,
 
     /// <summary>
     /// File-based JSON storage.
     /// </summary>
-    File,
+    File = 1,
 
     /// <summary>
     /// Redis database storage.
     /// </summary>
-    Redis,
+    Redis = 2,
 
     /// <summary>
     /// Dapr state store storage.
     /// </summary>
-    Dapr,
+    Dapr = 3,
 }
 
 /// <summary>
