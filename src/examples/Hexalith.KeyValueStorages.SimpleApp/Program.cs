@@ -6,12 +6,45 @@
 using Hexalith.Commons.Configurations;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.Files;
+using Hexalith.KeyValueStorages.Helpers;
+using Hexalith.KeyValueStorages.RedisDatabase;
+using Hexalith.KeyValueStorages.RedisDatabase.Extensions;
 using Hexalith.KeyValueStorages.SimpleApp.Components;
+
+// Ask user to choose storage type
+Console.WriteLine("Select storage type:");
+Console.WriteLine("1. Memory (in-memory storage)");
+Console.WriteLine("2. File (JSON file storage)");
+Console.WriteLine("3. Redis (Redis database storage)");
+Console.Write("Enter choice (1-3): ");
+
+string? choice = Console.ReadLine();
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// KeyValueStore configuration
-builder.Services.AddJsonFileKeyValueStore("sample"); // Add json file storage for key-value pairs
+// KeyValueStore configuration based on user choice
+switch (choice)
+{
+    case "1":
+        Console.WriteLine("Using Memory storage...");
+        builder.Services.AddMemoryKeyValueStore("sample");
+        break;
+    case "2":
+        Console.WriteLine("Using File storage...");
+        builder.Services.AddJsonFileKeyValueStore("sample");
+        break;
+    case "3":
+        Console.WriteLine("Using Redis storage...");
+        builder.Services.ConfigureSettings<RedisKeyValueStoreSettings>(builder.Configuration);
+        builder.Services.AddRedisConnection();
+        builder.Services.AddRedisKeyValueStorage<string, StateBase>("sample");
+        break;
+    default:
+        Console.WriteLine("Invalid choice. Defaulting to File storage...");
+        builder.Services.AddJsonFileKeyValueStore("sample");
+        break;
+}
+
 builder.Services.ConfigureSettings<KeyValueStoreSettings>(builder.Configuration); // Add configuration settings for the key-value store
 
 // Add services to the container.
