@@ -7,11 +7,13 @@ namespace Hexalith.KeyValueStorages.RedisDatabase;
 
 using System.Runtime.Serialization;
 
+using Hexalith.Commons.Configurations;
+
 /// <summary>
 /// Settings for Redis key-value store.
 /// </summary>
 [DataContract]
-public record RedisKeyValueStoreSettings
+public record RedisKeyValueStoreSettings : ISettings
 {
     /// <summary>
     /// Gets or sets the Redis connection string.
@@ -24,4 +26,7 @@ public record RedisKeyValueStoreSettings
     /// </summary>
     [DataMember(Order = 2)]
     public string? InstanceName { get; set; }
+
+    /// <inheritdoc/>
+    public static string ConfigurationName() => "KeyValueStorages:Redis";
 }

@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <NoWarn>$(NoWarn);CA1303</NoWarn>
   </PropertyGroup>
+  
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Hexalith.KeyValueStorages.Files\Hexalith.KeyValueStorages.Files.csproj" />

@@ -27,21 +27,24 @@ switch (choice)
 {
     case "1":
         Console.WriteLine("Using Memory storage...");
-        builder.Services.AddMemoryKeyValueStore("sample");
+        _ = builder.Services.AddMemoryKeyValueStore("sample");
         break;
+
     case "2":
         Console.WriteLine("Using File storage...");
-        builder.Services.AddJsonFileKeyValueStore("sample");
+        _ = builder.Services.AddJsonFileKeyValueStore("sample");
         break;
+
     case "3":
         Console.WriteLine("Using Redis storage...");
-        builder.Services.ConfigureSettings<RedisKeyValueStoreSettings>(builder.Configuration);
-        builder.Services.AddRedisConnection();
-        builder.Services.AddRedisKeyValueStorage<string, StateBase>("sample");
+        _ = builder.Services.ConfigureSettings<RedisKeyValueStoreSettings>(builder.Configuration);
+        _ = builder.Services.AddRedisConnection();
+        _ = builder.Services.AddRedisKeyValueStorage<string, StateBase>("sample");
         break;
+
     default:
         Console.WriteLine("Invalid choice. Defaulting to File storage...");
-        builder.Services.AddJsonFileKeyValueStore("sample");
+        _ = builder.Services.AddJsonFileKeyValueStore("sample");
         break;
 }
 
