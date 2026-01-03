@@ -5,7 +5,6 @@
 
 namespace Hexalith.KeyValueStorages.Tests;
 
-using System;
 using System.Runtime.Serialization;
 
 using Hexalith.KeyValueStorages.Helpers;
@@ -15,7 +14,7 @@ using Shouldly;
 /// <summary>
 /// Unit tests for the <see cref="StateHelper"/> class.
 /// </summary>
-public class StateHelperTests
+public partial class StateHelperTests
 {
     /// <summary>
     /// Tests that <see cref="StateHelper.GetStateName{TState}"/> returns the <see cref="DataContractAttribute.Name"/>
@@ -71,27 +70,4 @@ public class StateHelperTests
         // Assert
         result.ShouldBe(nameof(TestStateWithoutDataContract));
     }
-
-    /// <summary>
-    /// Test state with a <see cref="DataContractAttribute"/> specifying a custom serialization name.
-    /// </summary>
-    /// <param name="Etag">The entity tag used for concurrency control.</param>
-    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
-    [DataContract(Name = "CustomStateName")]
-    private sealed record TestStateWithDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
-
-    /// <summary>
-    /// Test state without a <see cref="DataContractAttribute"/>.
-    /// </summary>
-    /// <param name="Etag">The entity tag used for concurrency control.</param>
-    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
-    private sealed record TestStateWithoutDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
-
-    /// <summary>
-    /// Test state with a <see cref="DataContractAttribute"/> but without a custom name.
-    /// </summary>
-    /// <param name="Etag">The entity tag used for concurrency control.</param>
-    /// <param name="TimeToLive">The optional time-to-live for the state.</param>
-    [DataContract]
-    private sealed record TestStateWithDataContractNoName(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 }

@@ -14,7 +14,7 @@ using System;
 /// Initializes a new instance of the <see cref="FakeTimeProvider"/> class.
 /// </remarks>
 /// <param name="initialTime">The initial time.</param>
-internal class FakeTimeProvider(DateTimeOffset initialTime) : TimeProvider
+internal sealed class FakeTimeProvider(DateTimeOffset initialTime) : TimeProvider
 {
     /// <summary>
     /// Advances the current time by the specified duration.
