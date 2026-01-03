@@ -315,10 +315,7 @@ public class JsonFileKeyValueStorageTest : IDisposable
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist() =>
-
-        // Act & Assert
-        await Should.ThrowAsync<KeyNotFoundException>(
+    public async Task GetAsyncShouldThrowKeyNotFoundExceptionWhenKeyDoesNotExist() => await Should.ThrowAsync<KeyNotFoundException>(
             async () => await _storage.GetAsync("nonexistent", CancellationToken.None).ConfigureAwait(false));
 
     /// <summary>
