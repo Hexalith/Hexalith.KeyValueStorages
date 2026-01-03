@@ -11,6 +11,11 @@ using System.Threading.Tasks;
 
 using Hexalith.KeyValueStorages.Files;
 using Hexalith.KeyValueStorages.InMemory;
+using Hexalith.KeyValueStorages.RedisDatabase;
+
+using Microsoft.Extensions.Options;
+
+using StackExchange.Redis;
 
 /// <summary>
 /// Example program demonstrating the usage of key-value stores.
@@ -28,13 +33,15 @@ internal static class Program
         Console.WriteLine("Select storage type:");
         Console.WriteLine("1. Memory (in-memory storage)");
         Console.WriteLine("2. File (JSON file storage)");
-        Console.Write("Enter choice (1-2): ");
+        Console.WriteLine("3. Redis (Redis database storage)");
+        Console.Write("Enter choice (1-3): ");
 
         string? choice = Console.ReadLine();
 
         IKeyValueStore<string, CountryState> store = choice switch
         {
             "1" => CreateMemoryStore(),
+            "3" => CreateRedisStore(),
             _ => CreateFileStore(),
         };
 
@@ -89,5 +96,15 @@ internal static class Program
     {
         Console.WriteLine("Using Memory storage...");
         return new InMemoryKeyValueStore<string, CountryState>();
+    }
+
+    private static RedisKeyValueStore<string, CountryState> CreateRedisStore()
+    {
+        const string connectionString = "localhost:6379";
+        Console.WriteLine("Using Redis storage...");
+        Console.WriteLine("Connecting to: " + connectionString);
+        IConnectionMultiplexer connection = ConnectionMultiplexer.Connect(connectionString);
+        IOptions<KeyValueStoreSettings> settings = Options.Create(new KeyValueStoreSettings());
+        return new RedisKeyValueStore<string, CountryState>(connection, settings, "example");
     }
 }
