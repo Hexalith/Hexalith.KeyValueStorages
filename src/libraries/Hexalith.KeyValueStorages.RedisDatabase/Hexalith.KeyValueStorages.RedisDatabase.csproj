@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Hexalith.Commons.UniqueIds" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="StackExchange.Redis" Version="2.8.35" />
+    <PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.KeyValueStorages.Abstractions\Hexalith.KeyValueStorages.Abstractions.csproj" />
