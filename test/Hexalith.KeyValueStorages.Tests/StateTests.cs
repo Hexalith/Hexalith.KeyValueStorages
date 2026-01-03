@@ -175,5 +175,5 @@ public class StateTests
     /// </summary>
     /// <param name="Etag">Etag for concurrency control.</param>
     /// <param name="TimeToLive">Time to live for the state.</param>
-    private record TestState(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
+    private sealed record TestState(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 }

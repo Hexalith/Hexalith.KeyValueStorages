@@ -78,14 +78,14 @@ public class StateHelperTests
     /// <param name="Etag">The entity tag used for concurrency control.</param>
     /// <param name="TimeToLive">The optional time-to-live for the state.</param>
     [DataContract(Name = "CustomStateName")]
-    private record TestStateWithDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
+    private sealed record TestStateWithDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 
     /// <summary>
     /// Test state without a <see cref="DataContractAttribute"/>.
     /// </summary>
     /// <param name="Etag">The entity tag used for concurrency control.</param>
     /// <param name="TimeToLive">The optional time-to-live for the state.</param>
-    private record TestStateWithoutDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
+    private sealed record TestStateWithoutDataContract(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 
     /// <summary>
     /// Test state with a <see cref="DataContractAttribute"/> but without a custom name.
@@ -93,5 +93,5 @@ public class StateHelperTests
     /// <param name="Etag">The entity tag used for concurrency control.</param>
     /// <param name="TimeToLive">The optional time-to-live for the state.</param>
     [DataContract]
-    private record TestStateWithDataContractNoName(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
+    private sealed record TestStateWithDataContractNoName(string? Etag, TimeSpan? TimeToLive) : StateBase(Etag, TimeToLive);
 }

@@ -9,5 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Hexalith.Commons.Configurations" />
+    <PackageReference Include="Hexalith.Commons.StringEncoders" />
   </ItemGroup>
 </Project>

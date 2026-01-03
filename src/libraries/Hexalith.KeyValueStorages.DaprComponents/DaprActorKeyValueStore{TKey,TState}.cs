@@ -6,13 +6,11 @@
 namespace Hexalith.KeyValueStorages.DaprComponents;
 
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Dapr.Actors.Client;
 
-using Hexalith.Commons.StringEncoders;
 using Hexalith.KeyValueStorages;
 using Hexalith.KeyValueStorages.DaprComponents.Actors;
 
@@ -66,26 +64,11 @@ public class DaprActorKeyValueStore<TKey, TState>
         string? container,
         string? entity,
         TimeProvider? timeProvider = null)
-        : this(settings, database, container, entity, KeyToRfc1123, timeProvider)
+        : this(settings, database, container, entity, StateBase.KeyToRfc1123, timeProvider)
     {
     }
 
     private string ActorType => Database + "." + Container;
-
-    /// <summary>
-    /// Converts the key to an RFC 1123 string representation for use as an actor ID.
-    /// </summary>
-    /// <param name="key">The key to convert.</param>
-    /// <returns>The RFC 1123 string representation of the key.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the key is null or its string representation is null or empty.</exception>
-    public static string KeyToRfc1123(TKey key)
-    {
-        ArgumentNullException.ThrowIfNull(key);
-        string? keyString = key.ToString();
-        return string.IsNullOrWhiteSpace(keyString)
-            ? throw new ArgumentNullException(nameof(key), "key.ToString() cannot be null or empty")
-            : key.ToString()!.ToRFC1123(CultureInfo.InvariantCulture);
-    }
 
     /// <inheritdoc/>
     public override async Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken) => await GetActor(key).AddAsync(value, cancellationToken).ConfigureAwait(false);
