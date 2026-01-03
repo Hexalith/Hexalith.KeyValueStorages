@@ -49,5 +49,5 @@ public class DuplicateKeyException<TKey> : Exception
     /// <summary>
     /// Gets the key that caused the exception.
     /// </summary>
-    public TKey Key { get; } = default!;
+    public TKey? Key { get; init; }
 }

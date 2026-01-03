@@ -5,6 +5,10 @@
     <PackageProjectUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Hexalith/Hexalith.KeyValueStorages</RepositoryUrl>
     <PackageTags>hexalith;KeyValueStorages;</PackageTags>
+    <!-- Suppress warnings from Dapr.Actors.Generators generated code:
+         CS8619: Nullability mismatch in generated TryGetAsync (generator bug)
+         CS1591: Missing XML comments in generated client class -->
+    <NoWarn>$(NoWarn);CS8619;CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapr.Actors" />

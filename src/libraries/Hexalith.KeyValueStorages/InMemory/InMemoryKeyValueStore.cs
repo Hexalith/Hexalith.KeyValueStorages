@@ -83,9 +83,9 @@ public class InMemoryKeyValueStore<TKey, TState>(
                 throw new DuplicateKeyException<TKey>(key);
             }
 
-            string etag = string.IsNullOrWhiteSpace(value.Etag) ? UniqueIdHelper.GenerateUniqueStringId() : value.Etag;
+            string etag = value.Etag ?? UniqueIdHelper.GenerateUniqueStringId();
             _store[storeKey] = value with { Etag = etag };
-            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            if (value.TimeToLive > TimeSpan.Zero)
             {
                 _timeToLive[storeKey] = TimeProvider.GetUtcNow().Add(value.TimeToLive.Value);
             }
@@ -112,7 +112,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
 
             // Add or update the value
             _store[storeKey] = value with { Etag = newEtag };
-            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            if (value.TimeToLive > TimeSpan.Zero)
             {
                 _timeToLive[storeKey] = TimeProvider.GetUtcNow().Add(value.TimeToLive.Value);
             }
@@ -141,28 +141,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
     }
 
     /// <inheritdoc/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1229:Use async/await when necessary", Justification = "Do not await in locks")]
-    public override async Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        bool result;
-        using (_lock.EnterScope())
-        {
-            InMemoryKey<TKey> storeKey = GetKey(key);
-            CheckTimeToLive(storeKey);
-            result = _store.ContainsKey(storeKey);
-        }
-
-        return await Task.FromResult(result).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Checks if a key exists in the in-memory key-value store.
-    /// </summary>
-    /// <param name="key">The key to check for existence.</param>
-    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains true if the key exists; otherwise, false.</returns>
-    public override Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken)
+    public override Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using (_lock.EnterScope())
@@ -173,23 +152,29 @@ public class InMemoryKeyValueStore<TKey, TState>(
         }
     }
 
+    /// <summary>
+    /// Checks if a key exists in the in-memory key-value store.
+    /// </summary>
+    /// <param name="key">The key to check for existence.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains true if the key exists; otherwise, false.</returns>
+    public override Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken)
+        => ContainsKeyAsync(key, cancellationToken);
+
     /// <inheritdoc/>
-    public override async Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1229:Use async/await when necessary", Justification = "Synchronous operation wrapped in Task")]
+    public override Task<TState> GetAsync(TKey key, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        TState? result;
         using (_lock.EnterScope())
         {
             InMemoryKey<TKey> storeKey = GetKey(key);
             CheckTimeToLive(storeKey);
 
-            if (!_store.TryGetValue(storeKey, out result))
-            {
-                throw new KeyNotFoundException($"Key {key} not found.");
-            }
+            return _store.TryGetValue(storeKey, out TState? result)
+                ? Task.FromResult(result)
+                : throw new KeyNotFoundException($"Key {key} not found.");
         }
-
-        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -236,7 +221,7 @@ public class InMemoryKeyValueStore<TKey, TState>(
 
             string newEtag = UniqueIdHelper.GenerateUniqueStringId();
             _store[storeKey] = value with { Etag = newEtag };
-            if (value.TimeToLive is not null && value.TimeToLive.Value > TimeSpan.Zero)
+            if (value.TimeToLive > TimeSpan.Zero)
             {
                 _timeToLive[storeKey] = TimeProvider.GetUtcNow().Add(value.TimeToLive.Value);
             }
@@ -262,7 +247,6 @@ public class InMemoryKeyValueStore<TKey, TState>(
                 .Select(p => p.Key)];
             foreach (InMemoryKey<TKey> key in expiredKeys)
             {
-                // The key exists and has expired
                 _ = _store.Remove(key);
                 _ = _timeToLive.Remove(key);
             }
@@ -286,7 +270,6 @@ public class InMemoryKeyValueStore<TKey, TState>(
     {
         if (_timeToLive.TryGetValue(storeKey, out DateTimeOffset expirationTime) && expirationTime < TimeProvider.GetUtcNow())
         {
-            // The key exists and has expired
             _ = _store.Remove(storeKey);
             _ = _timeToLive.Remove(storeKey);
         }

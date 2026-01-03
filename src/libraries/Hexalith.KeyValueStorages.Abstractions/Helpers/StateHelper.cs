@@ -5,7 +5,8 @@
 
 namespace Hexalith.KeyValueStorages.Helpers;
 
-using System.Linq;
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 /// <summary>
@@ -13,6 +14,8 @@ using System.Runtime.Serialization;
 /// </summary>
 public static class StateHelper
 {
+    private static readonly ConcurrentDictionary<Type, string> _stateNameCache = new();
+
     /// <summary>
     /// Gets the state name from the DataContract attribute or the type name.
     /// </summary>
@@ -20,9 +23,7 @@ public static class StateHelper
     /// <returns>The name of the state.</returns>
     public static string GetStateName<TState>()
         where TState : StateBase =>
-        typeof(TState).GetCustomAttributes(typeof(DataContractAttribute), true)
-            .OfType<DataContractAttribute>()
-            .Select(attr => attr.Name)
-            .FirstOrDefault()
-                ?? typeof(TState).Name;
+        _stateNameCache.GetOrAdd(
+            typeof(TState),
+            static type => type.GetCustomAttribute<DataContractAttribute>()?.Name ?? type.Name);
 }

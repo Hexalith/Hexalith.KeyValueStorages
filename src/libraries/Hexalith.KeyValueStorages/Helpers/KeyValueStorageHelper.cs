@@ -38,7 +38,7 @@ public static class KeyValueStorageHelper
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        services.TryAddSingleton<TimeProvider>();
+        services.TryAddSingleton(TimeProvider.System);
         return services
             .AddKeyedTransient<IKeyValueProvider, InMemoryKeyValueProvider>(
                 name,
