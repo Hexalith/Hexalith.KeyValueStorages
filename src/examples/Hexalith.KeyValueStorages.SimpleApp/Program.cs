@@ -5,10 +5,12 @@
 
 using Hexalith.Commons.Configurations;
 using Hexalith.KeyValueStorages;
+using Hexalith.KeyValueStorages.DaprComponents.Extensions;
 using Hexalith.KeyValueStorages.Files;
 using Hexalith.KeyValueStorages.Helpers;
 using Hexalith.KeyValueStorages.RedisDatabase;
 using Hexalith.KeyValueStorages.RedisDatabase.Extensions;
+using Hexalith.KeyValueStorages.SimpleApp;
 using Hexalith.KeyValueStorages.SimpleApp.Components;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -37,10 +39,18 @@ switch (settings.StorageType)
         break;
 
     case KeyValueStorageType.File:
-    default:
         Console.WriteLine("Using File storage...");
         _ = builder.Services.AddJsonFileKeyValueStore("sample");
         break;
+
+    case KeyValueStorageType.Dapr:
+        Console.WriteLine("Using Dapr storage...");
+        _ = builder.Services.AddDaprActorKeyValueStorage<string, CountryState>(nameof(Country), nameof(Country));
+        _ = builder.Services.AddDaprKeyValueStoreActor<CountryState>(nameof(Country));
+        break;
+
+    default:
+        throw new NotSupportedException($"Storage type {settings.StorageType} is not supported.");
 }
 
 // Add services to the container.
