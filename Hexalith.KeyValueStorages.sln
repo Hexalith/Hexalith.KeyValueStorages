@@ -59,7 +59,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.RedisDatabase", "src\libraries\Hexalith.KeyValueStorages.RedisDatabase\Hexalith.KeyValueStorages.RedisDatabase.csproj", "{C3A9B2D1-E4F5-6A7B-8C9D-0E1F2A3B4C5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.JsonExample", "src\examples\Hexalith.KeyValueStorages.JsonExample\Hexalith.KeyValueStorages.JsonExample.csproj", "{4F78D044-435A-C7C2-7F8D-3EB0781E5D04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexalith.KeyValueStorages.Example", "src\examples\Hexalith.KeyValueStorages.Example\Hexalith.KeyValueStorages.Example.csproj", "{4F78D044-435A-C7C2-7F8D-3EB0781E5D04}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{EAFFAC48-00E0-46B3-BAD8-8BB859194988}"
 EndProject

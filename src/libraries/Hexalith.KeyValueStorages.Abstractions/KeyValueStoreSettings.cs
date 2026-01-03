@@ -10,6 +10,32 @@ using System.Runtime.Serialization;
 using Hexalith.Commons.Configurations;
 
 /// <summary>
+/// Specifies the type of storage backend to use for key-value storage.
+/// </summary>
+public enum KeyValueStorageType
+{
+    /// <summary>
+    /// In-memory storage (data is not persisted).
+    /// </summary>
+    Memory,
+
+    /// <summary>
+    /// File-based JSON storage.
+    /// </summary>
+    File,
+
+    /// <summary>
+    /// Redis database storage.
+    /// </summary>
+    Redis,
+
+    /// <summary>
+    /// Dapr state store storage.
+    /// </summary>
+    Dapr,
+}
+
+/// <summary>
 /// Represents the settings for a JSON-based key-value store.
 /// </summary>
 [DataContract]
@@ -24,20 +50,26 @@ public class KeyValueStoreSettings : ISettings
     /// <summary>
     /// Gets or sets the default container name.
     /// </summary>
-    [DataMember(Order = 3)]
+    [DataMember(Order = 4)]
     public string? DefaultContainer { get; set; } = _defaultContainerName;
 
     /// <summary>
     /// Gets or sets the name of the database.
     /// </summary>
-    [DataMember(Order = 2)]
+    [DataMember(Order = 3)]
     public string? DefaultDatabase { get; set; } = _defaultDatabaseName;
 
     /// <summary>
     /// Gets or sets the root path for storing files.
     /// </summary>
-    [DataMember(Order = 1)]
+    [DataMember(Order = 2)]
     public string? StorageRootPath { get; set; } = _defaultStorageRootPath;
+
+    /// <summary>
+    /// Gets or sets the storage type to use.
+    /// </summary>
+    [DataMember(Order = 1)]
+    public KeyValueStorageType StorageType { get; set; } = KeyValueStorageType.File;
 
     /// <summary>
     /// Gets the configuration name for the JSON key-value store settings.
