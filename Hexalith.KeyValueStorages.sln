@@ -85,12 +85,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{80
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hexalith.Builds", "Hexalith.Builds", "{3B64DD0C-1F7E-FF74-B7CF-E67EB8113937}"
 	ProjectSection(SolutionItems) = preProject
-		Hexalith.Builds\.clinerules = Hexalith.Builds\.clinerules
-		Hexalith.Builds\.cursorrules = Hexalith.Builds\.cursorrules
 		.editorconfig = .editorconfig
 		Hexalith.Builds\.gitignore = Hexalith.Builds\.gitignore
-		Hexalith.Builds\ai-assistant-instructions.md = Hexalith.Builds\ai-assistant-instructions.md
-		Hexalith.Builds\ai-commit-prompt.md = Hexalith.Builds\ai-commit-prompt.md
 		Hexalith.Builds\Hexalith.Build.props = Hexalith.Builds\Hexalith.Build.props
 		Hexalith.Builds\Hexalith.globalconfig = Hexalith.Builds\Hexalith.globalconfig
 		Hexalith.Builds\Hexalith.Package.props = Hexalith.Builds\Hexalith.Package.props
@@ -99,6 +95,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hexalith.Builds", "Hexalith
 		Hexalith.Builds\package.json = Hexalith.Builds\package.json
 		Hexalith.Builds\README.md = Hexalith.Builds\README.md
 		Hexalith.Builds\stylecop.json = Hexalith.Builds\stylecop.json
+		Hexalith.Builds\CLAUDE.md = Hexalith.Builds\CLAUDE.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Props", "Props", "{ACEC11B2-9E81-FF47-585D-69158486AF11}"

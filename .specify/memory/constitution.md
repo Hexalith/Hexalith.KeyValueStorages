@@ -1,145 +1,129 @@
 <!--
+================================================================================
 SYNC IMPACT REPORT
-==================
-Version change: 1.0.0 → 1.1.0 (MINOR - technology standards update)
-Modified principles: None
-Added sections: None
-Removed sections: None
-Updated sections:
-  - Technology Standards: .NET 8.0 → .NET 10.0, C# 12 → C# 13
-Templates requiring updates:
-  - .specify/templates/plan-template.md ✅ (compatible - uses placeholder for language/version)
-  - .specify/templates/spec-template.md ✅ (compatible - technology-agnostic)
-  - .specify/templates/tasks-template.md ✅ (compatible - uses placeholder for language)
+================================================================================
+Version Change: 0.0.0 → 1.0.0 (MAJOR - initial ratification)
+Modified Principles: N/A (initial version)
+Added Sections:
+  - Core Principles (5 principles)
+  - Technology Standards
+  - Quality Gates
+  - Governance
+Removed Sections: N/A (initial version)
+Templates Requiring Updates:
+  - .specify/templates/plan-template.md: ✅ Compatible (Constitution Check section exists)
+  - .specify/templates/spec-template.md: ✅ Compatible (requirements align with principles)
+  - .specify/templates/tasks-template.md: ✅ Compatible (test-first workflow supported)
+  - .specify/templates/commands/*.md: N/A (no command files found)
 Follow-up TODOs: None
+================================================================================
 -->
 
 # Hexalith.KeyValueStorages Constitution
 
 ## Core Principles
 
-### I. Test-Driven Development (NON-NEGOTIABLE)
+### I. Abstraction-First Design
 
-All new features and bug fixes MUST follow strict TDD methodology:
+Every storage feature MUST be defined as an interface in `Hexalith.KeyValueStorages.Abstractions` before implementation.
 
-- Tests MUST be written before implementation code
-- Tests MUST fail before implementation begins (Red phase)
-- Implementation MUST only satisfy the failing tests (Green phase)
-- Refactoring MUST NOT change test outcomes (Refactor phase)
-- All public APIs MUST have corresponding unit tests
-- Integration tests MUST cover cross-provider scenarios
+- All public APIs MUST depend on abstractions, never concrete implementations
+- Storage providers MUST implement `IKeyValueStore<TKey, TValue>` and `IKeyValueProvider` interfaces
+- New storage backends MUST be pluggable without modifying existing code
+- Consumers MUST be able to switch backends via dependency injection configuration alone
 
-**Rationale**: TDD ensures correctness, prevents regressions, and drives clean API design. A key-value storage library is foundational infrastructure where bugs have cascading effects on dependent applications.
+**Rationale**: Multiple storage backends (in-memory, file-based, Dapr) require a stable contract. Abstraction-first ensures backends remain interchangeable and testable in isolation.
 
-### II. Async-First API Design
+### II. Concurrency Safety (NON-NEGOTIABLE)
 
-All public APIs MUST be asynchronous by default:
+All storage operations MUST support optimistic concurrency control via ETags.
 
-- All I/O-bound operations MUST return `Task<T>` or `ValueTask<T>`
-- All async methods MUST accept `CancellationToken` as the final parameter
-- Synchronous wrappers are FORBIDDEN in public APIs
-- Async method names MUST end with `Async` suffix
-- `ConfigureAwait(false)` MUST be used in library code
+- `Add`, `Set`, and `Remove` operations MUST validate ETags when provided
+- ETag mismatches MUST throw `ConcurrencyException` with clear diagnostics
+- All implementations MUST be thread-safe for concurrent read/write access
+- State mutations MUST be atomic at the key level
 
-**Rationale**: Storage operations are inherently I/O-bound. Async-first design prevents thread pool starvation and enables efficient scaling in high-throughput scenarios.
+**Rationale**: Key-value stores are inherently concurrent. Without strict ETag enforcement and thread safety, data corruption and lost updates become inevitable in production systems.
 
-### III. Provider Extensibility
+### III. Test-First Development
 
-The library MUST support easy implementation of custom storage providers:
+Tests MUST be written before implementation code. No exceptions.
 
-- All storage backends MUST implement `IKeyValueStore<TKey, TValue>`
-- Provider implementations MUST be isolated in separate NuGet packages
-- Core abstractions MUST NOT depend on concrete implementations
-- New providers MUST require only interface implementation, not inheritance
-- Provider registration MUST use standard .NET dependency injection patterns
+- Unit tests use XUnit framework with Shouldly assertions (per Hexalith standards)
+- Each storage provider MUST pass the same contract test suite
+- Tests MUST cover: basic CRUD, ETag validation, TTL expiration, concurrent access
+- Red-Green-Refactor cycle strictly enforced: tests fail first, then pass
 
-**Rationale**: Different applications have different storage requirements. The library succeeds by enabling diverse backends while maintaining a consistent API contract.
+**Rationale**: A storage library's reliability is paramount. Test-first ensures all edge cases (expiration, conflicts, missing keys) are considered before implementation, preventing production failures.
 
-### IV. Thread Safety
+### IV. Minimal API Surface
 
-All implementations MUST support concurrent access:
+Public APIs MUST be minimal, discoverable, and consistent across all providers.
 
-- Public methods MUST be safe for concurrent invocation
-- Internal state MUST be protected with appropriate synchronization
-- Lock contention MUST be minimized through fine-grained locking or lock-free techniques
-- Thread safety guarantees MUST be documented in XML comments
-- Race conditions MUST be detected via concurrent integration tests
+- Core operations limited to: `AddAsync`, `GetAsync`, `TryGetAsync`, `SetAsync`, `RemoveAsync`, `ContainsKeyAsync`
+- All async methods MUST accept `CancellationToken` as final parameter
+- Method signatures MUST be identical across all `IKeyValueStore` implementations
+- Avoid provider-specific methods in the public interface; use options/settings for customization
 
-**Rationale**: Key-value stores are frequently accessed by multiple threads or async operations simultaneously. Thread safety is a correctness requirement, not an optimization.
+**Rationale**: Consumers should learn one API and use any backend. Divergent APIs per provider would defeat the purpose of the abstraction layer and increase integration burden.
 
-### V. Optimistic Concurrency
+### V. Configuration Over Code
 
-ETags MUST be used for all mutable operations:
+Storage behavior MUST be configurable without code changes.
 
-- `AddAsync` MUST return the initial ETag
-- `SetAsync` MUST validate the provided ETag and return the new ETag
-- `RemoveAsync` MUST validate the provided ETag
-- ETag mismatches MUST throw `ConcurrencyException`
-- ETags MUST be opaque strings with no guaranteed format
+- Connection strings, paths, and timeouts MUST come from `IConfiguration` (e.g., `appsettings.json`)
+- Default values MUST be sensible for local development (e.g., `./data` for file storage)
+- Provider selection MUST be achievable via DI registration, not compile-time decisions
+- Settings classes MUST be immutable records with validation
 
-**Rationale**: Distributed systems require conflict detection. Optimistic concurrency via ETags prevents silent data loss without the overhead of pessimistic locking.
-
-### VI. Simplicity Over Abstraction
-
-Implementation MUST favor clarity over cleverness:
-
-- No feature MUST be added without a concrete use case
-- Abstractions MUST be introduced only when three or more implementations exist
-- Configuration MUST use simple, flat structures where possible
-- Error messages MUST be actionable and include context
-- YAGNI (You Aren't Gonna Need It) MUST guide feature decisions
-
-**Rationale**: Library complexity becomes user complexity. Every abstraction layer is a maintenance burden and learning curve for consumers.
+**Rationale**: Deployment environments vary (dev/staging/prod). Code changes for configuration defeat CI/CD automation and increase deployment risk.
 
 ## Technology Standards
 
-**.NET Version**: .NET 10.0 or later
-**Language**: C# 13 with nullable reference types enabled
-**Testing Framework**: xUnit with FluentAssertions
-**Dependency Injection**: Microsoft.Extensions.DependencyInjection
-**Serialization**: System.Text.Json (default), extensible for alternatives
-**Code Analysis**: SonarCloud, Codacy, Coverity for static analysis
-**Package Format**: NuGet with semantic versioning
+**Language/Version**: C# 14+ on .NET 10+
+**Testing Framework**: XUnit with Shouldly assertions
+**Serialization**: System.Text.Json with polymorphic support
+**DI Container**: Microsoft.Extensions.DependencyInjection
+**Configuration**: Microsoft.Extensions.Configuration (IOptions pattern)
+**Distributed Runtime**: Dapr 1.16+ (for DaprComponents package)
 
-## Development Workflow
+**Package Structure**:
+| Package | Purpose |
+|---------|---------|
+| `Hexalith.KeyValueStorages.Abstractions` | Interfaces, base classes, exceptions |
+| `Hexalith.KeyValueStorages` | In-memory implementation |
+| `Hexalith.KeyValueStorages.Files` | JSON file-based implementation |
+| `Hexalith.KeyValueStorages.DaprComponents` | Dapr state store integration |
 
-### Code Review Requirements
+## Quality Gates
 
-- All changes MUST be submitted via pull request
-- PRs MUST pass all CI checks before merge
-- PRs MUST include tests for new functionality
-- Breaking changes MUST be documented in PR description
-- API changes MUST update XML documentation
+All pull requests MUST pass before merge:
 
-### Quality Gates
-
-- Code coverage MUST NOT decrease
-- Static analysis MUST report zero new critical/blocker issues
-- All tests MUST pass on Windows, Linux, and macOS
-- NuGet package MUST build successfully
-
-### Versioning Policy
-
-- MAJOR: Breaking API changes, removed features
-- MINOR: New features, new providers, backward-compatible additions
-- PATCH: Bug fixes, documentation, performance improvements
-- Pre-release versions use `-preview.N` suffix
+1. **Build**: `dotnet build` succeeds with zero warnings (treat warnings as errors)
+2. **Tests**: All unit and integration tests pass (`dotnet test`)
+3. **Coverage**: New code MUST have test coverage (measured via SonarCloud)
+4. **Static Analysis**: Coverity, Codacy, and SonarCloud checks pass
+5. **API Compatibility**: No breaking changes to public interfaces without MAJOR version bump
+6. **Documentation**: Public APIs MUST have XML documentation comments
 
 ## Governance
 
-This constitution supersedes all other development practices for the Hexalith.KeyValueStorages project.
+This constitution supersedes all informal practices and ad-hoc decisions.
 
-**Amendment Procedure**:
-
-1. Propose changes via GitHub issue with `constitution` label
-2. Changes MUST be discussed for minimum 7 days
-3. Breaking principle changes require MAJOR version bump
-4. All amendments MUST include migration guidance if applicable
+**Amendment Process**:
+1. Propose change via pull request modifying this file
+2. Document rationale and impact on existing code
+3. Require approval from at least one maintainer
+4. Update `CONSTITUTION_VERSION` following semantic versioning:
+   - MAJOR: Principle removal, redefinition, or backward-incompatible governance change
+   - MINOR: New principle added or existing principle materially expanded
+   - PATCH: Clarifications, typo fixes, non-semantic refinements
 
 **Compliance Review**:
+- Code reviewers MUST verify PR compliance with all principles
+- Violations MUST be justified in the Complexity Tracking section of implementation plans
+- Unjustified violations block merge
 
-- All PRs MUST verify compliance with Core Principles
-- Violations MUST be documented and justified in Complexity Tracking section of plan.md
-- Annual review of constitution relevance and principle effectiveness
+**Commit Messages**: All commits MUST follow Angular Conventional Commits specification (per Hexalith.Builds/CLAUDE.md).
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-04 | **Last Amended**: 2026-01-04
+**Version**: 1.0.0 | **Ratified**: 2025-01-04 | **Last Amended**: 2025-01-04
