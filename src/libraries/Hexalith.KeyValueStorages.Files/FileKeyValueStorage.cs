@@ -6,7 +6,9 @@
 namespace Hexalith.KeyValueStorages.Files;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -88,6 +90,130 @@ public abstract class FileKeyValueStorage<TKey, TState>
         return File.Exists(filePath)
             ? await SetAsync(key, value, cancellationToken).ConfigureAwait(false)
             : await AddAsync(key, value, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Not applicable")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Best effort cleanup")]
+    public override async Task<IReadOnlyList<string>> AddRangeAsync(
+        IEnumerable<(TKey Key, TState Value)> items,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        List<(TKey Key, TState Value)> itemList = [.. items];
+
+        // Handle empty batch
+        if (itemList.Count == 0)
+        {
+            return [];
+        }
+
+        // Phase 1: Pre-validate - check for existing keys in store
+        List<TKey> existingKeys = [];
+        foreach ((TKey key, _) in itemList)
+        {
+            if (await ReadAsync(key, cancellationToken).ConfigureAwait(false) is not null)
+            {
+                existingKeys.Add(key);
+            }
+        }
+
+        if (existingKeys.Count > 0)
+        {
+            throw new BatchAddException<TKey>(
+                existingKeys,
+                BatchAddFailureReason.DuplicateKeysInStore);
+        }
+
+        // Create temp directory for atomic batch write
+        string tempDir = Path.Combine(GetDirectoryPath(), $".batch_{Guid.NewGuid():N}");
+        string mainDir = GetDirectoryPath();
+        List<string> tempFilePaths = [];
+        List<(TKey Key, string TempPath, string FinalPath, string Etag)> fileMapping = [];
+
+        try
+        {
+            // Create directories if needed
+            if (!Directory.Exists(mainDir))
+            {
+                _ = Directory.CreateDirectory(mainDir);
+            }
+
+            _ = Directory.CreateDirectory(tempDir);
+
+            // Phase 2: Write all files to temp directory
+            foreach ((TKey key, TState value) in itemList)
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                string fileName = KeyToFileName(key);
+                string tempFilePath = Path.Combine(tempDir, fileName);
+                string finalFilePath = Path.Combine(mainDir, fileName);
+                string etag = string.IsNullOrWhiteSpace(value.Etag) ? UniqueIdHelper.GenerateUniqueStringId() : value.Etag;
+
+                await using FileStream stream = new(
+                    tempFilePath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None);
+                await WriteToStreamAsync(stream, value with { Etag = etag }, cancellationToken).ConfigureAwait(false);
+                await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+                tempFilePaths.Add(tempFilePath);
+                fileMapping.Add((key, tempFilePath, finalFilePath, etag));
+            }
+
+            // Phase 3: Atomic move - move all files from temp to final location
+            List<string> movedFiles = [];
+            try
+            {
+                foreach ((_, string tempPath, string finalPath, _) in fileMapping)
+                {
+                    File.Move(tempPath, finalPath);
+                    movedFiles.Add(finalPath);
+                }
+
+                // Success - return ETags in order
+                return [.. fileMapping.Select(f => f.Etag)];
+            }
+            catch (Exception)
+            {
+                // Compensating rollback: remove any files that were moved to final location
+                foreach (string movedFile in movedFiles)
+                {
+                    try
+                    {
+                        if (File.Exists(movedFile))
+                        {
+                            File.Delete(movedFile);
+                        }
+                    }
+                    catch
+                    {
+                        // Best effort cleanup
+                    }
+                }
+
+                throw;
+            }
+        }
+        finally
+        {
+            // Clean up temp directory
+            try
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, recursive: true);
+                }
+            }
+            catch
+            {
+                // Best effort cleanup
+            }
+        }
     }
 
     /// <inheritdoc/>

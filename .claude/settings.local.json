@@ -10,7 +10,18 @@
       "Bash(powershell:*)",
       "Bash(dir:*)",
       "Bash(if not exist \"specs\\\\001-batch-persist\\\\contracts\" mkdir \"specs\\\\001-batch-persist\\\\contracts\")",
-      "Bash(if not exist \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\" mkdir \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\")"
+      "Bash(if not exist \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\" mkdir \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\")",
+      "Bash(ls:*)",
+      "Bash(xargs:*)",
+      "Bash(if [ -d \"d:/Hexalith.KeyValueStorages/specs\" ])",
+      "Bash(then ls d:/Hexalith.KeyValueStorages/specs/)",
+      "Bash(else echo \"0\")",
+      "Bash(fi)",
+      "Bash(test:*)",
+      "Bash(git log:*)",
+      "Bash(find:*)",
+      "Bash(if not exist \"D:\\\\Hexalith.KeyValueStorages\\\\specs\\\\003-atomic-add-acid\\\\contracts\" mkdir \"D:\\\\Hexalith.KeyValueStorages\\\\specs\\\\003-atomic-add-acid\\\\contracts\")",
+      "Bash(if not exist \"D:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.Abstractions\\\\Exceptions\" mkdir \"D:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.Abstractions\\\\Exceptions\")"
     ]
   }
 }

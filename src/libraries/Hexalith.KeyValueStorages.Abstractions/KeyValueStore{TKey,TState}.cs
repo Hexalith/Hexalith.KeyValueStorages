@@ -6,6 +6,7 @@
 namespace Hexalith.KeyValueStorages;
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,11 +41,21 @@ public abstract class KeyValueStore<TKey, TState>(
     where TKey : notnull, IEquatable<TKey>
     where TState : StateBase
 {
+    /// <summary>
+    /// The default maximum batch size for batch operations.
+    /// </summary>
+    public const int DefaultMaxBatchSize = 1000;
+
     /// <inheritdoc/>
     public abstract Task<string> AddAsync(TKey key, TState value, CancellationToken cancellationToken);
 
     /// <inheritdoc/>
     public abstract Task<string> AddOrUpdateAsync(TKey key, TState value, CancellationToken cancellationToken);
+
+    /// <inheritdoc/>
+    public abstract Task<IReadOnlyList<string>> AddRangeAsync(
+        IEnumerable<(TKey Key, TState Value)> items,
+        CancellationToken cancellationToken);
 
     /// <inheritdoc/>
     public abstract Task<bool> ContainsKeyAsync(TKey key, CancellationToken cancellationToken);

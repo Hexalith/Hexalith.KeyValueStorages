@@ -6,6 +6,7 @@ namespace Hexalith.KeyValueStorages.InMemory;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -122,6 +123,83 @@ public class InMemoryKeyValueStore<TKey, TState>(
             }
 
             return Task.FromResult(newEtag);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override Task<IReadOnlyList<string>> AddRangeAsync(
+        IEnumerable<(TKey Key, TState Value)> items,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        List<(TKey Key, TState Value)> itemList = [.. items];
+
+        // Handle empty batch
+        if (itemList.Count == 0)
+        {
+            return Task.FromResult<IReadOnlyList<string>>([]);
+        }
+
+        using (_lock.EnterScope())
+        {
+            // Phase 1: Pre-validate - check for existing keys in store
+            List<TKey> existingKeys = [];
+            foreach ((TKey key, _) in itemList)
+            {
+                InMemoryKey<TKey> storeKey = GetKey(key);
+                CheckTimeToLive(storeKey);
+                if (_store.ContainsKey(storeKey))
+                {
+                    existingKeys.Add(key);
+                }
+            }
+
+            if (existingKeys.Count > 0)
+            {
+                throw new BatchAddException<TKey>(
+                    existingKeys,
+                    BatchAddFailureReason.DuplicateKeysInStore);
+            }
+
+            // Phase 2: Atomic write - all items guaranteed to be written within lock scope
+            List<string> etags = new(itemList.Count);
+            List<InMemoryKey<TKey>> addedKeys = new(itemList.Count);
+
+            try
+            {
+                foreach ((TKey key, TState value) in itemList)
+                {
+                    ArgumentNullException.ThrowIfNull(value);
+
+                    InMemoryKey<TKey> storeKey = GetKey(key);
+                    string etag = value.Etag ?? UniqueIdHelper.GenerateUniqueStringId();
+
+                    _store[storeKey] = value with { Etag = etag };
+                    addedKeys.Add(storeKey);
+
+                    if (value.TimeToLive > TimeSpan.Zero)
+                    {
+                        _timeToLive[storeKey] = TimeProvider.GetUtcNow().Add(value.TimeToLive.Value);
+                    }
+
+                    etags.Add(etag);
+                }
+
+                return Task.FromResult<IReadOnlyList<string>>(etags.AsReadOnly());
+            }
+            catch (Exception)
+            {
+                // Compensating rollback: remove any items that were added
+                foreach (InMemoryKey<TKey> storeKey in addedKeys)
+                {
+                    _ = _store.Remove(storeKey);
+                    _ = _timeToLive.Remove(storeKey);
+                }
+
+                throw;
+            }
         }
     }
 

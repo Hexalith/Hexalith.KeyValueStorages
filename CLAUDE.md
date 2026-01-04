@@ -1,1 +1,3 @@
-Read instructions in [Hexalith Builds Claude.md](./Hexalith.Builds/CLAUDE.md) carefully before answering.
+# AI Instructions
+
+Please read and follow the instructions in [Hexalith.Builds/CLAUDE.md](./Hexalith.Builds/CLAUDE.md) for coding standards, build commands, and project conventions.

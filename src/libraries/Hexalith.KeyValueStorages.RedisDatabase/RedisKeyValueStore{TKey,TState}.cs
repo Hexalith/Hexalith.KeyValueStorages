@@ -6,6 +6,8 @@
 namespace Hexalith.KeyValueStorages.RedisDatabase;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,6 +104,103 @@ public class RedisKeyValueStore<TKey, TState>(
         _ = await db.StringSetAsync(redisKey, serializedValue, GetExpiration(value.TimeToLive)).ConfigureAwait(false);
 
         return newEtag;
+    }
+
+    /// <inheritdoc/>
+    public override async Task<IReadOnlyList<string>> AddRangeAsync(
+        IEnumerable<(TKey Key, TState Value)> items,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        List<(TKey Key, TState Value)> itemList = [.. items];
+
+        // Handle empty batch
+        if (itemList.Count == 0)
+        {
+            return [];
+        }
+
+        IDatabase db = _connectionMultiplexer.GetDatabase();
+
+        // Phase 1: Pre-validate - check for existing keys in store
+        List<TKey> existingKeys = [];
+        foreach ((TKey key, _) in itemList)
+        {
+            string redisKey = GetRedisKey(key);
+            if (await db.KeyExistsAsync(redisKey).ConfigureAwait(false))
+            {
+                existingKeys.Add(key);
+            }
+        }
+
+        if (existingKeys.Count > 0)
+        {
+            throw new BatchAddException<TKey>(
+                existingKeys,
+                BatchAddFailureReason.DuplicateKeysInStore);
+        }
+
+        // Phase 2: Execute atomic transaction using Redis MULTI/EXEC
+        ITransaction transaction = db.CreateTransaction();
+        List<(TKey Key, string RedisKey, string Etag, Task<bool> SetTask)> operations = [];
+
+        foreach ((TKey key, TState value) in itemList)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            string redisKey = GetRedisKey(key);
+            string etag = value.Etag ?? UniqueIdHelper.GenerateUniqueStringId();
+            TState stateWithEtag = value with { Etag = etag };
+            string serializedValue = JsonSerializer.Serialize(stateWithEtag, _jsonSerializerOptions);
+
+            TimeSpan? expiry = value.TimeToLive > TimeSpan.Zero ? value.TimeToLive : null;
+
+            // Queue the operation - use When.NotExists for atomic add
+            Task<bool> setTask = transaction.StringSetAsync(redisKey, serializedValue, expiry, when: When.NotExists);
+            operations.Add((key, redisKey, etag, setTask));
+        }
+
+        // Execute the transaction
+        bool committed = await transaction.ExecuteAsync().ConfigureAwait(false);
+
+        if (!committed)
+        {
+            throw new BatchAddException<TKey>(
+                [.. itemList.Select(i => i.Key)],
+                BatchAddFailureReason.TransactionAborted);
+        }
+
+        // Verify all operations succeeded
+        List<TKey> failedKeys = [];
+        foreach ((TKey key, _, _, Task<bool> setTask) in operations)
+        {
+            if (!await setTask.ConfigureAwait(false))
+            {
+                failedKeys.Add(key);
+            }
+        }
+
+        if (failedKeys.Count > 0)
+        {
+            // Some keys already existed - need to rollback the ones that succeeded
+            foreach ((_, string redisKey, _, Task<bool> setTask) in operations)
+            {
+                if (await setTask.ConfigureAwait(false))
+                {
+                    // This key was added - remove it for rollback
+                    _ = await db.KeyDeleteAsync(redisKey).ConfigureAwait(false);
+                }
+            }
+
+            throw new BatchAddException<TKey>(
+                failedKeys,
+                BatchAddFailureReason.DuplicateKeysInStore);
+        }
+
+        // Return ETags in order
+        return [.. operations.Select(o => o.Etag)];
     }
 
     /// <inheritdoc/>
