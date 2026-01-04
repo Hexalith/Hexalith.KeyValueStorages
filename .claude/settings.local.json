@@ -4,7 +4,13 @@
       "Bash(dotnet test:*)",
       "Bash(Select-String -Pattern \"Exception|FAIL|Error\" -Context 0,5)",
       "Bash(findstr:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(git fetch:*)",
+      "Bash(pwsh:*)",
+      "Bash(powershell:*)",
+      "Bash(dir:*)",
+      "Bash(if not exist \"specs\\\\001-batch-persist\\\\contracts\" mkdir \"specs\\\\001-batch-persist\\\\contracts\")",
+      "Bash(if not exist \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\" mkdir \"d:\\\\Hexalith.KeyValueStorages\\\\src\\\\libraries\\\\Hexalith.KeyValueStorages.DaprComponents\\\\Workflows\")"
     ]
   }
 }
